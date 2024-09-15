@@ -65,6 +65,10 @@ install_deb() {
       fi
     }
 
+    install_debugpy() {
+      sudo apt install python3-debugpy
+    }
+
     install_yaml_language_server_if_not_exists() {
       if ! [ -x "$(command -v yaml-language-server)" ]; then
         echo "********************************"
@@ -127,6 +131,8 @@ install_deb() {
     install_go_if_not_exists
 
     install_pyright_if_not_exists
+
+    install_debugpy
 
     install_yaml_language_server_if_not_exists
 
