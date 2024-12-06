@@ -124,6 +124,17 @@ install_deb() {
       fi
     }
 
+    install_java_if_not_exists() {
+        echo "**********************"
+        echo "* INSTALL OPENJDK 18 *"
+        echo "**********************"
+        sudo apt install openjdk-18-jdk
+    }
+
+    install_maven_if_not_exists() {
+      curl -L https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz | tar xzvf  -
+    }
+
     sudo apt install -y git wget curl 
     # For vterm
     sudo apt install -y gcc g++ libtool-bin cmake ripgrep
