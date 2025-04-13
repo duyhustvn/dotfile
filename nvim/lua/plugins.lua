@@ -26,5 +26,18 @@ require("lazy").setup({
       dependencies = {
         "nvim-tree/nvim-web-devicons", -- file icon
       },
-    }
+    },
+
+    -- Git
+    {
+      "NeogitOrg/neogit",
+      dependencies = {
+        "nvim-lua/plenary.nvim",         -- required
+        "sindrets/diffview.nvim",        -- optional - Diff integration
+        -- Only one of these is needed.
+        "nvim-telescope/telescope.nvim", -- optional - For better picker experience
+        "ibhagwan/fzf-lua",              -- optional
+        "echasnovski/mini.pick",         -- optional
+      },
+    },
 })
