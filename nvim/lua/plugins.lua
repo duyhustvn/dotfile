@@ -40,4 +40,29 @@ require("lazy").setup({
         "echasnovski/mini.pick",         -- optional
       },
     },
+
+    -- Find file
+    {
+        'nvim-telescope/telescope.nvim',
+        tag = '0.1.8',
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+            -- Optional: for better sorting performance
+            { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' }
+        },
+    },
+
+    -- Autocompletion
+    {
+        "hrsh7th/nvim-cmp",
+        dependencies = {
+            "hrsh7th/cmp-nvim-lsp",           -- LSP completion source
+            "hrsh7th/cmp-buffer",             -- Buffer completion source
+            "hrsh7th/cmp-path",               -- Path completion source
+            "hrsh7th/cmp-cmdline",            -- Cmdline completion source
+            "L3MON4D3/LuaSnip",              -- Snippet engine
+            "saadparwaiz1/cmp_luasnip",      -- Snippet completion source
+            "rafamadriz/friendly-snippets",   -- Useful snippets
+        },
+    },
 })
