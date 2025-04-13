@@ -530,3 +530,18 @@
     (insert (sodcof/convert-camel-case-to-env-format replaced-string))
   )
 )
+
+(require 'json)
+
+(defun sodcof/json-to-string (start end)
+  "Convert JSON object in the selected region to a JSON string.
+The region is specified by START and END positions."
+  (interactive "r") ;; Make function interactive and use the region
+  (let* ((json-input (buffer-substring-no-properties start end)) ;; Extract selected JSON
+         (parsed-json (json-parse-string json-input)) ;; Parse the JSON
+         (json-encoding-pretty-print nil) ;; Disable pretty-print for compact output
+         (json-string (json-encode parsed-json))) ;; Convert back to JSON string
+    (message "JSON String: %s" json-string) ;; Show in minibuffer
+    (kill-new json-string) ;; Copy to clipboard
+    (with-output-to-temp-buffer "*JSON String*"
+      (princ json-string)))) ;; Output to a temporary buffer

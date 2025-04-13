@@ -35,9 +35,44 @@ install_go_tool() {
   go install go.uber.org/mock/mockgen@latest
 }
 
-shell_config_file_path="$HOME/.profile"
+shell_config_file_path="$HOME/.zshrc"
 
 install_deb() {
+    install_font() {
+        echo "***************************"
+        echo "* INSTALL FONTS POWERLINE *"
+        echo "***************************"
+      sudo apt-get install fonts-powerline
+    }
+
+    # NEO VIM
+    install_neovim_if_not_exists() {
+      if ! [ -x "$(command -v nvim)" ]; then
+        echo "******************"
+        echo "* INSTALL NEOVIM *"
+        echo "******************"
+	      curl -L https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64.tar.gz | tar -xz
+        echo "**************************************"
+        echo "* MOVE NEOVIM TO INSTALLED DIRECTORY *"
+        echo "**************************************"
+        sudo rm -rf /usr/local/nvim
+        sudo mv nvim-linux64 /usr/local/nvim
+
+        if ! grep -qxF 'export PATH=$PATH:/usr/local/nvim/bin' $shell_config_file_path; then
+          echo 'export PATH=$PATH:/usr/local/nvim/bin' >> $shell_config_file_path
+          echo 'Reload environment'
+          source $shell_config_file_path
+        fi
+      fi
+    }
+
+
+    
+    ################################
+    ##### PROGRAMMING LANGUAGE #####
+    ################################
+    
+    # GOLANG
     install_go_if_not_exists() {
       if ! [ -x "$(command -v go)" ]; then
         echo -n "Go is NOT installed."
@@ -56,28 +91,16 @@ install_deb() {
       fi
     }
 
-    install_pyright_if_not_exists() {
-      if ! [ -x "$(command -v pyright)" ]; then
-        echo "*******************"
-        echo "* INSTALL PYRIGHT *"
-        echo "*******************"
-        sudo snap install pyright --classic
-      fi
+    # JAVA
+    install_java_if_not_exists() {
+        echo "**********************"
+        echo "* INSTALL OPENJDK 18 *"
+        echo "**********************"
+        sudo apt install openjdk-18-jdk
     }
 
-    install_debugpy() {
-      sudo apt install python3-debugpy
-    }
-
-    install_yaml_language_server_if_not_exists() {
-      if ! [ -x "$(command -v yaml-language-server)" ]; then
-        echo "********************************"
-        echo "* INSTALL YAML LANGUAGE SERVER *"
-        echo "********************************"
-        sudo snap install yaml-language-server
-      fi
-    }
-
+    
+    # NODEJS
     install_node_if_not_exists() {
       if ! [ -x "$(command -v node)" ]; then
         echo "******************"
@@ -87,62 +110,101 @@ install_deb() {
       fi
     }
 
-    install_font() {
-        echo "***************************"
-        echo "* INSTALL FONTS POWERLINE *"
-        echo "***************************"
-      sudo apt-get install fonts-powerline
-    }
-
+    # RUST
     install_rust_if_not_exists() {
       if ! [ -x "$(command -v rustc)" ]; then
         echo "****************"
         echo "* INSTALL RUST *"
         echo "****************"
         curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
-        rustup component add rust-analyzer
       fi
     }
 
-    install_neovim_if_not_exists() {
-      if ! [ -x "$(command -v nvim)" ]; then
-        echo "******************"
-        echo "* INSTALL NEOVIM *"
-        echo "******************"
-	curl -L https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64.tar.gz | tar -xz
-        echo "**************************************"
-        echo "* MOVE NEOVIM TO INSTALLED DIRECTORY *"
-        echo "**************************************"
-        sudo rm -rf /usr/local/nvim
-        sudo mv nvim-linux64 /usr/local/nvim
-
-        if ! grep -qxF 'export PATH=$PATH:/usr/local/nvim/bin' $shell_config_file_path; then
-          echo 'export PATH=$PATH:/usr/local/nvim/bin' >> $shell_config_file_path
-          echo 'Reload environment'
-          source $shell_config_file_path
+    ##############################
+    ##### PACKAGE MANAGEMENT #####
+    ##############################
+    
+    install_maven_if_not_exists() {
+        if ! [ -x "$(command -v mvn)" ]; then
+            maven_version=3.9.9
+            curl -L https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-${maven_version}-bin.tar.gz | tar xzf  -
+            mv apache-maven-${maven_version} /opt
+            echo 'export PATH=$PATH:/opt/apache-maven-${maven_version}/bin' >> $shell_config_file_path
+            echo 'Reload environment'
+            source $shell_config_file_path
         fi
+    }
+
+    ###########################
+    ##### LANGUAGE SERVER #####
+    ###########################
+
+    # DEBUG PY
+    install_debugpy() {
+      sudo apt install python3-debugpy
+    }
+
+    # PYRIGHT
+    install_pyright_if_not_exists() {
+      if ! [ -x "$(command -v pyright)" ]; then
+        echo "*******************"
+        echo "* INSTALL PYRIGHT *"
+        echo "*******************"
+        sudo snap install pyright --classic
       fi
     }
 
-    sudo apt install -y git wget curl 
-    # For vterm
-    sudo apt install -y gcc g++ libtool-bin cmake ripgrep
+    # RUST ANALYZER
+    install_rust_analyzer() {
+      rustup component add rust-analyzer
+    }
 
-    install_go_if_not_exists
+    # TYPESCRIPT
+    install_typescript_language_server() {
+        sudo npm i -g typescript
+        sudo npm i -g typescript-language-server
+    }
 
-    install_pyright_if_not_exists
+    # YAML
+    install_yaml_language_server_if_not_exists() {
+      if ! [ -x "$(command -v yaml-language-server)" ]; then
+        echo "********************************"
+        echo "* INSTALL YAML LANGUAGE SERVER *"
+        echo "********************************"
+        sudo snap install yaml-language-server
+      fi
+    }
 
-    install_debugpy
 
-    install_yaml_language_server_if_not_exists
-
-    install_node_if_not_exists
+    sudo apt install -y build-essential git wget curl cmake ripgrep
+    sudo apt install -y libtool-bin
 
     install_font
 
+    install_neovim_if_not_exists
+
+    ## INSTALL PROGRAMMING LANGUAGE 
+    install_go_if_not_exists
+
+    install_node_if_not_exists
+
+    install_java_if_not_exists
+
     install_rust_if_not_exists
 
-    install_neovim_if_not_exists
+    ## INSTALL PACKAGE MANAGEMENT
+    install_maven_if_not_exists
+
+    ## INSTALL LANGUAGE SERVER
+    install_debugpy
+
+    install_pyright_if_not_exists
+
+    install_rust_analyzer
+
+    install_typescript_language_server
+
+    install_yaml_language_server_if_not_exists
 }
 
 PKGTYPE=unknown
