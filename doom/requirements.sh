@@ -99,6 +99,17 @@ install_deb() {
         sudo apt install openjdk-18-jdk
     }
 
+    # LUA
+    install_lua_if_not_exists() {
+      echo "***************"
+      echo "* INSTALL LUA *"
+      echo "***************"
+      lua_version=5.4.7
+      curl -L https://www.lua.org/ftp/lua-${lua_version}.tar.gz | tar zx
+      cd lua-${lua_version}
+      make
+      sudo make install
+    }
     
     # NODEJS
     install_node_if_not_exists() {
@@ -119,6 +130,8 @@ install_deb() {
         curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
       fi
     }
+
+
 
     ##############################
     ##### PACKAGE MANAGEMENT #####
@@ -183,12 +196,14 @@ install_deb() {
 
     install_neovim_if_not_exists
 
-    ## INSTALL PROGRAMMING LANGUAGE 
+    ## INSTALL PROGRAMMING LANGUAGE
+    install_java_if_not_exists
+
     install_go_if_not_exists
 
-    install_node_if_not_exists
+    install_lua_if_not_exists
 
-    install_java_if_not_exists
+    install_node_if_not_exists
 
     install_rust_if_not_exists
 
