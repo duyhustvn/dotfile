@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
 
+
 install_go_tool() {
   # gopls
   go install golang.org/x/tools/gopls@latest
@@ -42,7 +43,7 @@ install_deb() {
         echo "***************************"
         echo "* INSTALL FONTS POWERLINE *"
         echo "***************************"
-      sudo apt-get install fonts-powerline
+        sudo apt install -y fonts-powerline
     }
 
     # NEO VIM
@@ -51,7 +52,7 @@ install_deb() {
         echo "******************"
         echo "* INSTALL NEOVIM *"
         echo "******************"
-	      curl -L https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64.tar.gz | tar -xz
+	    curl -L https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64.tar.gz | tar -xz
         echo "**************************************"
         echo "* MOVE NEOVIM TO INSTALLED DIRECTORY *"
         echo "**************************************"
@@ -94,21 +95,23 @@ install_deb() {
     # JAVA
     install_java_if_not_exists() {
         echo "**********************"
-        echo "* INSTALL OPENJDK 18 *"
+        echo "* INSTALL OPENJDK 21 *"
         echo "**********************"
-        sudo apt install openjdk-18-jdk
+        sudo apt install -y openjdk-21-jdk
     }
 
     # LUA
     install_lua_if_not_exists() {
-      echo "***************"
-      echo "* INSTALL LUA *"
-      echo "***************"
-      lua_version=5.4.7
-      curl -L https://www.lua.org/ftp/lua-${lua_version}.tar.gz | tar zx
-      cd lua-${lua_version}
-      make
-      sudo make install
+      if ! [ -x "$(command -v lua)" ]; then
+        echo "***************"
+        echo "* INSTALL LUA *"
+        echo "***************"
+        lua_version=5.4.7
+        curl -L https://www.lua.org/ftp/lua-${lua_version}.tar.gz | tar zx
+        cd lua-${lua_version}
+        make
+        sudo make install
+      fi
     }
     
     # NODEJS
@@ -117,7 +120,10 @@ install_deb() {
         echo "******************"
         echo "* INSTALL NODEJS *"
         echo "******************"
-        sudo snap install node --classic
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.2/install.sh | bash
+        \. "$HOME/.nvm/nvm.sh" # restart nvm
+        nvm install 22
+        source $shell_config_file_path
       fi
     }
 
@@ -140,9 +146,9 @@ install_deb() {
     install_maven_if_not_exists() {
         if ! [ -x "$(command -v mvn)" ]; then
             maven_version=3.9.9
-            curl -L https://dlcdn.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-${maven_version}-bin.tar.gz | tar xzf  -
-            mv apache-maven-${maven_version} /opt
-            echo 'export PATH=$PATH:/opt/apache-maven-${maven_version}/bin' >> $shell_config_file_path
+            curl -L https://dlcdn.apache.org/maven/maven-3/${maven_version}/binaries/apache-maven-${maven_version}-bin.tar.gz | tar xzf  -
+            sudo mv apache-maven-${maven_version} /opt
+            echo "export PATH=\$PATH:/opt/apache-maven-${maven_version}/bin" >> $shell_config_file_path
             echo 'Reload environment'
             source $shell_config_file_path
         fi
@@ -154,7 +160,7 @@ install_deb() {
 
     # DEBUG PY
     install_debugpy() {
-      sudo apt install python3-debugpy
+      sudo apt install -y python3-debugpy
     }
 
     # PYRIGHT
@@ -174,8 +180,11 @@ install_deb() {
 
     # TYPESCRIPT
     install_typescript_language_server() {
-        sudo npm i -g typescript
-        sudo npm i -g typescript-language-server
+        echo "********************************"
+        echo "* INSTALL TSLS LANGUAGE SERVER *"
+        echo "********************************"
+        npm i -g typescript
+        npm i -g typescript-language-server
     }
 
     # YAML
