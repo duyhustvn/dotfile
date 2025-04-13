@@ -158,6 +158,24 @@ install_deb() {
     ##### LANGUAGE SERVER #####
     ###########################
 
+    # Clang 
+    install_clangd_lsp() {
+
+     clangd_version=20.1.0
+     clangd_lsp_folder=~/.config/emacs/.local/etc/lsp/clangd
+     echo "check if ${clangd_lsp_folder}/clangd_${clangd_version} exists"
+     if ! [ -f "${clangd_lsp_folder}/clangd_${clangd_version}/bin/clangd" ]; then
+        echo "******************"
+        echo "* INSTALL CLANGD *"
+        echo "******************"
+
+        mkdir -p ${clangd_lsp_folder}
+        curl -L https://github.com/clangd/clangd/releases/download/${clangd_version}/clangd-linux-${clangd_version}.zip -o clangd-linux-${clangd_version}.zip
+        unzip clangd-linux-${clangd_version}.zip
+        mv clangd_${clangd_version} ${clangd_lsp_folder}
+      fi
+    }
+
     # DEBUG PY
     install_debugpy() {
       sudo apt install -y python3-debugpy
@@ -220,6 +238,8 @@ install_deb() {
     install_maven_if_not_exists
 
     ## INSTALL LANGUAGE SERVER
+    install_clangd_lsp
+
     install_debugpy
 
     install_pyright_if_not_exists

@@ -249,6 +249,11 @@ Make startup faster by reducing the frequency of garbage collection and then use
 )
 #+end_src
 
+** Clangd
+#+begin_src emacs-lisp
+(after! lsp-clangd
+  (setq lsp-clangd-binary-path "~/.config/emacs/.local/etc/lsp/clangd/clangd_20.1.0/bin/clangd"))
+#+end_src
 
 * Dap mode
 #+begin_src emacs-lisp

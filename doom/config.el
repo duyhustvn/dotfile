@@ -202,6 +202,9 @@
   ;; (add-to-list 'lsp-file-watch-ignored-files "[/\\\\]\\.my-files\\'")
 )
 
+(after! lsp-clangd
+  (setq lsp-clangd-binary-path "~/.config/emacs/.local/etc/lsp/clangd/clangd_20.1.0/bin/clangd"))
+
 (use-package! dap-mode
   ;; :init
   ;; code here will be run immediately
