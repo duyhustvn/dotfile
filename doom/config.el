@@ -333,11 +333,6 @@
   (engine-mode 1)
 )
 
-(use-package! counsel
-  :config
-  (counsel-mode 1)
-)
-
 (defun efs/org-font-setup ()
   ;; Replace list hyphen with dot
   (font-lock-add-keywords 'org-mode

@@ -152,6 +152,7 @@ Make startup faster by reducing the frequency of garbage collection and then use
 )
 #+end_src
 
+
 * Savehist
 #+begin_src emacs-lisp
 (use-package! savehist
@@ -161,12 +162,14 @@ Make startup faster by reducing the frequency of garbage collection and then use
 )
 #+end_src
 
+
 * Magit
 #+begin_src emacs-lisp
 ;; shows a TODOs section in your git status buffer containing all lines with TODO
 (use-package magit-todos
   :defer t)
 #+end_src
+
 
 * Treemacs
 #+begin_src emacs-lisp
@@ -199,6 +202,7 @@ Make startup faster by reducing the frequency of garbage collection and then use
 )
 #+end_src
 
+
 * PDF
 #+begin_src emacs-lisp
 (use-package! pdf-tools
@@ -225,6 +229,7 @@ Make startup faster by reducing the frequency of garbage collection and then use
 )
 #+end_src
 
+
 * Terminal
 ** Vterm
 - Set default shell to zsh
@@ -232,6 +237,7 @@ Make startup faster by reducing the frequency of garbage collection and then use
  (after! vterm
    (setq vterm-shell "/bin/zsh"))
   #+end_src
+
 
 * Lsp mode
 ** Ignore files watch
@@ -391,6 +397,7 @@ else
 fi
 #+end_src
 
+
 * Golang
 #+begin_src emacs-lisp
 (after! go-mode
@@ -398,11 +405,13 @@ fi
   (add-hook 'before-save-hook 'gofmt-before-save))
 #+end_src
 
+
 * C/C++
 #+begin_src emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c-mode))
 (add-to-list 'auto-mode-alist '("\\.hpp\\'" . c++-mode))
 #+end_src
+
 
 * Undo
 #+begin_src emacs-lisp
@@ -423,16 +432,6 @@ fi
   (engine-mode 1)
 )
 #+end_src
-
-
-* Counsel
-#+begin_src emacs-lisp
-(use-package! counsel
-  :config
-  (counsel-mode 1)
-)
-#+end_src
-
 
 * Org mode
 ** Font faces
