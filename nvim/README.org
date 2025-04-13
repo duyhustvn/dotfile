@@ -14,5 +14,11 @@ ln -s ./nvim ~/.config/nvim
 #+end_src shell
 - Close neovim and reopen to activate the configuration
 
+* LSP
+- Location
+#+begin_src shell
+/home/$USER/.local/share/nvim/mason/packages
+#+end_src shell
+
 * Reference
 - https://martinlwx.github.io/en/config-neovim-from-scratch/

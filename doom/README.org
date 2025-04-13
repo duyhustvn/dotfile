@@ -1,7 +1,12 @@
 * Doom emacs
-** References:
-*** https://config.daviwil.com/emacs
-*** https://git.tecosaur.net/tec/emacs-config/src/branch/master/config.org#user-content-headline-303
+- LSP
+  - Location
+  #+begin_src shell
+  /home/$USER/.config/emacs/.local/etc/lsp
+  #+end_src
+- References:
+  - https://config.daviwil.com/emacs
+  - https://git.tecosaur.net/tec/emacs-config/src/branch/master/config.org#user-content-headline-303
 
 * Post-installation
 - Install theme with emacs command: all-the-icons-install-fonts
