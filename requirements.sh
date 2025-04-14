@@ -105,10 +105,10 @@ install_deb() {
         echo "* INSTALL LUA *"
         echo "***************"
         lua_version=5.4.7
-        curl -L https://www.lua.org/ftp/lua-${lua_version}.tar.gz | tar zx
+        curl -L https://github.com/lua/lua/archive/refs/tags/v${lua_version}.tar.gz | tar zx
         cd lua-${lua_version}
         make
-        sudo make install
+        sudo cp lua /usr/local/bin/lua
       fi
     }
     
