@@ -76,9 +76,7 @@ install_deb() {
     # GOLANG
     install_go_if_not_exists() {
       if ! [ -x "$(command -v go)" ]; then
-        echo -n "Go is NOT installed."
-        # snap install go --classic
-        sudo wget -O - https://go.dev/dl/go1.21.6.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local/
+        curl -L https://go.dev/dl/go1.24.2.linux-amd64.tar.gz | sudo tar -xzf - -C /usr/local/
 
         if ! grep -qxF 'export PATH=$PATH:/usr/local/go/bin' $shell_config_file_path
         then
@@ -187,12 +185,15 @@ install_deb() {
         echo "*******************"
         echo "* INSTALL PYRIGHT *"
         echo "*******************"
-        sudo snap install pyright --classic
+        npm i -g pyright
       fi
     }
 
     # RUST ANALYZER
     install_rust_analyzer() {
+        echo "********************************"
+        echo "* INSTALL RUST LANGUAGE SERVER *"
+        echo "********************************"
       rustup component add rust-analyzer
     }
 
@@ -211,7 +212,7 @@ install_deb() {
         echo "********************************"
         echo "* INSTALL YAML LANGUAGE SERVER *"
         echo "********************************"
-        sudo snap install yaml-language-server
+        npm i -g yaml-language-server
       fi
     }
 
