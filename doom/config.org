@@ -162,6 +162,42 @@ Make startup faster by reducing the frequency of garbage collection and then use
 )
 #+end_src
 
+* Search
+#+begin_src emacs-lisp
+(after! vertico
+  (setq vertico-count 17)
+  (vertico-mode +1))
+
+;; (use-package! vertico-posframe
+;;   :config
+;;   (vertico-posframe-mode 1))
+
+(after! marginalia
+  (marginalia-mode +1))
+
+;; Configure project search preview
+(after! consult
+  ;; Enable automatic preview at point
+  (consult-preview-at-point-mode)
+
+  ;; Configure preview for ripgrep (project search)
+  (setq consult-ripgrep-args "rg --null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --line-number --hidden --with-filename")
+
+  ;; Enable preview for project search
+  (setq consult-preview-key 'any) ;; Press Alt + . for search preview
+  (setq consult-preview-raw-size 1024000)
+  (setq consult-preview-max-size 1024000)
+  (setq consult-preview-delay 0.1)
+
+  ;; Configure where the preview window appears
+  (setq consult--preview-function #'consult--preview-top)
+  (setq consult-preview-variants
+        '(consult--preview-top
+          consult--preview-bottom
+          consult--preview-right))
+)
+
+#+end_src
 
 * Magit
 #+begin_src emacs-lisp
