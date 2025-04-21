@@ -32,6 +32,6 @@ vim.keymap.set('n', '<leader><leader>', ':Telescope find_files<CR>', opts)
 -- Find in all files (including hidden ones)
 vim.keymap.set('n', '<leader>fa', ':Telescope find_files hidden=true no_ignore=true<CR>', opts)
 -- Live grep (search in all files content)
-vim.keymap.set('n', '<leader>fg', ':Telescope live_grep<CR>', opts)
+vim.keymap.set('n', '<leader>/', ':Telescope live_grep<CR>', opts)
 -- Buffers
 vim.keymap.set('n', '<leader>fb', ':Telescope buffers<CR>', opts)
