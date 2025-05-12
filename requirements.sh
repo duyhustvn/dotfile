@@ -104,7 +104,7 @@ install_deb() {
         echo "***************"
         echo "* INSTALL LUA *"
         echo "***************"
-        lua_version=5.4.7
+        lua_version=5.3.5
         curl -L https://github.com/lua/lua/archive/refs/tags/v${lua_version}.tar.gz | tar zx
         cd lua-${lua_version}
         make
