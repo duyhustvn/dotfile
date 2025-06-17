@@ -1,3 +1,7 @@
+-- Make sure you have a patched Nerd Font installed and configured in your terminal
+-- Install nvim-web-devicons if not already installed
+-- Use :PackerInstall nvim-web-devicons or your package manager's equivalent
+
 require("nvim-tree").setup({
     sort_by = "case_sensitive",
     view = {
@@ -20,6 +24,10 @@ require("nvim-tree").setup({
             },
         },
         icons = {
+            webdev_colors = true,
+            git_placement = "before",
+            padding = " ",
+            symlink_arrow = " ➛ ",
             show = {
                 file = true,
                 folder = true,
