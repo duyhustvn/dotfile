@@ -10,7 +10,7 @@ require('mason').setup({
 
 require('mason-lspconfig').setup({
     -- A list of servers to automatically install if they're not already installed
-    ensure_installed = { 'gopls', 'lua_ls', 'rust_analyzer', 'clangd' },
+    ensure_installed = { 'gopls', 'lua_ls', 'rust_analyzer', 'clangd', 'yamlls', 'ts_ls' },
 })
 
 
@@ -69,5 +69,34 @@ lspconfig.rust_analyzer.setup({
 })
 
 lspconfig.clangd.setup({
+	on_attach = on_attach,
+})
+
+-- Configure YAML LSP
+lspconfig.yamlls.setup({
+    on_attach = on_attach,
+    settings = {
+        yaml = {
+            schemas = {
+                ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+                ["https://json.schemastore.org/github-action.json"] = "/.github/actions/*/action.yml",
+                ["https://json.schemastore.org/ansible-playbook.json"] = "*playbook*.yml",
+                ["https://json.schemastore.org/kustomization.json"] = "kustomization.yaml",
+                ["https://json.schemastore.org/chart.json"] = "Chart.yaml",
+                ["https://json.schemastore.org/docker-compose.json"] = "docker-compose*.yml",
+                ["https://json.schemastore.org/helmfile.json"] = "helmfile.yaml",
+                ["https://json.schemastore.org/gitlab-ci.json"] = ".gitlab-ci.yml",
+            },
+            format = {
+                enable = true,
+            },
+            validate = true,
+            completion = true,
+            hover = true,
+        },
+    },
+})
+
+lspconfig.ts_ls.setup({
 	on_attach = on_attach,
 })
