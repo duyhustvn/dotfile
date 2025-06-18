@@ -1,11 +1,19 @@
 * Setup neo vim
 - Copying config for neovim by creating symbol
 #+begin_src shell
-ln -s ./nvim ~/.config/nvim
+ln -s $(pwd)/nvim ~/.config/nvim
 #+end_src shell
 
 * Setup doom
 - Copying config for doom by creating symbol
 #+begin_src shell
-ln -s ./doom ~/.config/doom
+ln -s $(pwd)/doom ~/.config/doom
 #+end_src shell
+
+* Setup tmux
+- Copying config for tmux by creating symbol
+#+begin_src shell
+ln -s $(pwd)/tmux/tmux.conf ~/.tmux.conf
+#+end_src shell
+
+
