@@ -39,14 +39,14 @@ require("nvim-tree").setup({
                 symlink = "",
                 bookmark = "",
                 folder = {
-                    arrow_closed = "",
-                    arrow_open = "",
-                    default = "",
-                    open = "",
-                    empty = "",
-                    empty_open = "",
-                    symlink = "",
-                    symlink_open = "",
+                    arrow_closed = "",  -- Alternative: "▶"
+                    arrow_open = "",    -- Alternative: "▼"
+                    default = "📁",      -- Simple folder icon
+                    open = "📂",         -- Simple open folder icon
+                    empty = "📁",        -- Simple empty folder icon
+                    empty_open = "📂",   -- Simple empty open folder icon
+                    symlink = "📁",      -- Simple symlink folder icon
+                    symlink_open = "📂", -- Simple symlink open folder icon
                 },
                 git = {
                     unstaged = "✗",
