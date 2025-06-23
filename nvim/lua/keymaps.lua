@@ -15,10 +15,6 @@ vim.keymap.set('n', '<C-Down>', ':resize +2<CR>', opts)
 vim.keymap.set('n', '<C-Left>', ':vertical resize -2<CR>', opts)
 vim.keymap.set('n', '<C-Right>', ':vertical resize +2<CR>', opts)
 
--- Window splitting
-vim.keymap.set('n', '<C-x>2', ':split<CR>', opts) -- horizontal split
-vim.keymap.set('n', '<C-x>3', ':vsplit<CR>', opts) -- vertical split
-
 -----------------
 -- Visual mode --
 -----------------
@@ -35,3 +31,6 @@ vim.keymap.set('n', '<leader>fa', ':Telescope find_files hidden=true no_ignore=t
 vim.keymap.set('n', '<leader>/', ':Telescope live_grep<CR>', opts)
 -- Buffers
 vim.keymap.set('n', '<leader>fb', ':Telescope buffers<CR>', opts)
+
+-- Open terminal
+vim.keymap.set('n', '<leader>ot', ':botright split | terminal<CR>', opts)
