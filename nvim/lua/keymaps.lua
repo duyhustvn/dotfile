@@ -34,3 +34,9 @@ vim.keymap.set('n', '<leader>fb', ':Telescope buffers<CR>', opts)
 
 -- Open terminal
 vim.keymap.set('n', '<leader>ot', ':botright split | terminal<CR>', opts)
+
+-- Clipboard shortcuts (optional - your current config should work without these)
+-- Copy to system clipboard in visual mode
+vim.keymap.set('v', '<C-c>', '"+y', opts)
+-- Paste from system clipboard in insert mode
+vim.keymap.set('i', '<C-v>', '<C-r>+', opts)

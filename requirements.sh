@@ -67,7 +67,9 @@ install_deb() {
       fi
     }
 
-
+    install_wayland_clipboard() {
+      sudo apt install wl-clipboard
+    }
     
     ################################
     ##### PROGRAMMING LANGUAGE #####
@@ -221,6 +223,8 @@ install_deb() {
     sudo apt install -y libtool-bin
 
     install_font
+
+    install_wayland_clipboard
 
     install_neovim_if_not_exists
 
