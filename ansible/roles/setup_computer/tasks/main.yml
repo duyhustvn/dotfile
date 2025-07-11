@@ -43,5 +43,8 @@
   debug:
     msg: "Shell configuration path: {{ shell_config_path }}"
 
+- name: Install packages
+  include_tasks: install_packages.yml
+
 - name: Install golang
   include_tasks: install_go.yml

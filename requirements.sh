@@ -52,7 +52,7 @@ install_deb() {
         echo "******************"
         echo "* INSTALL NEOVIM *"
         echo "******************"
-	    curl -L https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64.tar.gz | tar -xz
+	      curl -L https://github.com/neovim/neovim/releases/download/v0.10.1/nvim-linux64.tar.gz | tar -xz
         echo "**************************************"
         echo "* MOVE NEOVIM TO INSTALLED DIRECTORY *"
         echo "**************************************"
