@@ -1,0 +1,9 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for roles/golang
+
+go_version: "1.24.5"
+go_archive: "go{{ go_version }}.linux-amd64.tar.gz"
+go_url: "https://go.dev/dl/{{ go_archive }}"
+go_install_dir: "/usr/local"
+go_bin_path: "/usr/local/go/bin/go"

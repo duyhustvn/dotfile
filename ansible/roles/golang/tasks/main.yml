@@ -1,3 +1,7 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/golang
+
 - name: Check if Go is already installed
   stat:
     path: "{{ go_bin_path }}"
