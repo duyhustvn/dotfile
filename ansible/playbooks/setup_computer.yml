@@ -1,6 +1,6 @@
 ---
 - name: Setup Computer
-  hosts: localhost
+  hosts: all
   become: true
   gather_facts: true
 
@@ -15,12 +15,10 @@
         msg: "Proxy is SET to '{{ proxy }}'"
       when: (proxy | default('')) | trim != ""
 
-
     - name: Debug
       debug:
         msg: "Proxy is not SET"
       when: (proxy | default('')) | trim == ""
 
-
   roles:
-    - setup_computer
+    - docker
