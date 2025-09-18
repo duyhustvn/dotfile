@@ -1,0 +1,23 @@
+* Setup requirements packages
+#+begin_src shell
+cd ansible
+ansible-playbook playbooks/setup_computer.yml --ask-become-pass
+#+end_src shell
+
+* Setup neo vim
+- Copying config for neovim by creating symbol
+#+begin_src shell
+ln -s $(pwd)/nvim ~/.config/nvim
+#+end_src shell
+
+* Setup doom
+- Copying config for doom by creating symbol
+#+begin_src shell
+ln -s $(pwd)/doom ~/.config/doom
+#+end_src shell
+
+* Setup tmux
+- Copying config for tmux by creating symbol
+#+begin_src shell
+ln -s $(pwd)/tmux/tmux.conf ~/.tmux.conf
+#+end_src shell

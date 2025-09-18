@@ -1,0 +1,7 @@
+---
+# tasks file for setup_computer
+
+# Set shell configuration path globally for all tasks
+
+- name: Install packages
+  include_tasks: install_packages.yml

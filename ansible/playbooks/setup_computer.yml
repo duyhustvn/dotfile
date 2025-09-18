@@ -1,0 +1,30 @@
+---
+- name: Setup Computer
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:  
+    - name: Detect user shell
+      include_role:
+        name: shell_detect
+
+  tasks:
+    - name: Debug
+      debug:
+        msg: "playbook_dir: {{ playbook_dir }}, inventory_hostname: {{ inventory_hostname }}"
+      tags: [ debug ]
+
+    - name: Debug
+      debug:
+        msg: "Proxy is SET to '{{ proxy }}'"
+      when: (proxy | default('')) | trim != ""
+
+    - name: Debug
+      debug:
+        msg: "Proxy is not SET"
+      when: (proxy | default('')) | trim == ""
+
+  roles:
+    - docker
+    - golang

@@ -1,0 +1,98 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/golang
+
+- name: Check if Go is already installed
+  stat:
+    path: "{{ go_bin_path }}"
+  register: go_stat
+
+- block:
+    - name: Download Go archive
+      get_url:
+        url: "{{ go_url }}"
+        dest: "/tmp/{{ go_archive }}"
+        mode: '0644'
+        
+    - name: Remove existing Go installation (if any)
+      file:
+        path: "{{ go_install_dir }}/go"
+        state: absent
+
+    - name: Extract Go archive
+      unarchive:
+        src: "/tmp/{{ go_archive }}"
+        dest: "{{ go_install_dir }}"
+        remote_src: yes
+
+    - name: Ensure /usr/local/go/bin is in the PATH (user shell config)
+      lineinfile:
+        path: "{{ shell_config_path }}"
+        line: 'export PATH=$PATH:/usr/local/go/bin'
+        create: yes
+        backup: yes
+      become: false
+
+    - name: Ensure $HOME/go/bin is in the PATH (user shell config)
+      lineinfile:
+        path: "{{ shell_config_path }}"
+        line: 'export PATH=$PATH:$HOME/go/bin'
+        create: yes
+        backup: yes
+      become: false
+
+    - name: Also create system-wide profile for compatibility
+      lineinfile:
+        path: /etc/profile.d/go.sh
+        line: 'export PATH=$PATH:/usr/local/go/bin'
+        create: yes
+        mode: '0755'
+
+    - name: Verify Go installation (direct path)
+      shell: "/usr/local/go/bin/go version"
+      register: go_version_check
+      become: false
+      ignore_errors: true
+
+    - name: Verify Go is in PATH (after sourcing config)
+      shell: "PATH=$PATH:/usr/local/go/bin go version"
+      register: go_path_check
+      become: false
+      ignore_errors: true
+
+    - name: Display Go installation results
+      debug:
+        msg:
+          - "Go binary check: {{ 'SUCCESS' if go_version_check.rc == 0 else 'FAILED' }}"
+          - "Go version: {{ go_version_check.stdout if go_version_check.rc == 0 else 'Not found' }}"
+          - "PATH check: {{ 'SUCCESS' if go_path_check.rc == 0 else 'FAILED' }}"
+          - "Shell config updated: {{ shell_config_path }}"
+          - "Note: You may need to restart your shell or run 'source {{ shell_config_path }}' to use 'go' command"
+
+  when: not go_stat.stat.exists
+
+- block: 
+  - name: Install go packages
+    shell: |
+      /usr/local/go/bin/go install golang.org/x/tools/gopls@latest
+
+      /usr/local/go/bin/go install github.com/x-motemen/gore/cmd/gore@latest
+
+      /usr/local/go/bin/go install github.com/stamblerre/gocode@latest
+
+      /usr/local/go/bin/go install golang.org/x/tools/cmd/godoc@latest
+
+      /usr/local/go/bin/go install golang.org/x/tools/cmd/goimports@latest
+
+      /usr/local/go/bin/go install golang.org/x/tools/cmd/gorename@latest
+
+      /usr/local/go/bin/go install golang.org/x/tools/cmd/guru@latest
+
+      /usr/local/go/bin/go install github.com/cweill/gotests/gotests@latest
+
+      /usr/local/go/bin/go install github.com/fatih/gomodifytags@latest
+
+      /usr/local/go/bin/go install github.com/go-delve/delve/cmd/dlv@latest
+
+      /usr/local/go/bin/go install go.uber.org/mock/mockgen@latest
+    become: false

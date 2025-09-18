@@ -1,0 +1,548 @@
+#+title: Desktop
+#+PROPERTY: header-args:emacs-lisp
+
+* Natural scroll
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun sodcof/natural-scroll-activated ()
+  (start-process-shell-command "xinput" nil "xinput set-prop 'pointer:ELAN0676:00 04F3:3195 Touchpad' 'libinput Natural Scrolling Enabled' 1")
+)
+#+end_src
+
+* UI
+#+begin_src emacs-lisp :tangle ./desktop.el
+;; Set frame transparency
+(set-frame-parameter (selected-frame) 'alpha '(90 . 90))
+(add-to-list 'default-frame-alist '(alpha . (90 . 90)))
+(set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+#+end_src
+
+* Touchpad tapping
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun sodcof/touchpad-tapping-activated ()
+  (start-process-shell-command "xinput" nil "xinput set-prop 'pointer:ELAN0676:00 04F3:3195 Touchpad' 'libinput Tapping Enabled' 1")
+)
+#+end_src
+
+
+* Background
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun efs/set-wallpaper ()
+  (interactive)
+  ;; NOTE: You will need to update this to a valid background path!
+  (start-process-shell-command
+      "feh" nil "feh --bg-scale /usr/share/backgrounds/Mirror_by_Uday_Nakade.jpg"))
+
+#+end_src
+
+
+* Multiple monitor
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun sodcof/get-list-monitors()
+  ;; Get a list of connected monitors
+  (setq all-monitor (shell-command-to-string "xrandr --query | grep ' connected' | cut -d ' ' -f1"))
+  ; => "eDP-1
+  ; DP-1
+  ; "
+
+  ; t -> remove null/empty
+  (split-string all-monitor "\n" t) ; => ("eDP-1" "DP-1")
+)
+
+
+(defun sodcof/set-up-multiple-monitor()
+  (interactive)
+  (let ((monitors (sodcof/get-list-monitors)))
+    ;; (message "current monitors: %s" monitors)
+    (if (> (length monitors) 1)
+        (progn
+          (setq main-monitor (nth 0 monitors))
+          (setq attached-monitor (nth 1 monitors))
+          ;;(message "attached-monitor: %s" attached-monitor)
+          ;;(message "main-monitor: %s" main-monitor)
+
+          ;; Using xrandr to setup multiple monitor
+          ;; xrandr --output eDP-1 --primary --mode 1920x1080 --rate 60.00 --output DP-2 --mode 1920x1080 --rate 60.00 --right-of eDP-1
+          ;; xrandr --output eDP-1 --primary --mode 1920x1080 --rate 60.00 --output HDMI-1 --mode 1920x1080 --rate 60.00 --above eDP-1
+
+          (if (string= attached-monitor 'HDMI-1)
+              (setq position "--above")
+              (setq position "--right-of"))
+
+          (setq xrandr-command (format "xrandr --output %s --primary --mode 1920x1080 --rate 60.00 --output %s --mode 1920x1080 --rate 60.00 %s %s" main-monitor attached-monitor position main-monitor))
+
+          (message "xrandr command: %s" xrandr-command)
+          ;; execute xrandr command
+          ;; example: (start-process-shell-command "xrandr" nil "xrandr --output eDP-1 --primary --mode 1920x1080 --rate 60.00 --output DP-1 --mode 1920x1080 --rate 60.00")
+          (start-process-shell-command "xrandr" nil xrandr-command)
+
+          ;; set workspace to monitor
+          ;; (setq exwm-randr-workspace-monitor-plist '(2 "HDMI-1"))
+          ;; set workspace 2 to monitor HDMI-1
+          (setq exwm-randr-workspace-monitor-plist (list 2 attached-monitor))
+        )
+    )
+  )
+)
+
+(defun efs/update-displays ()
+  ;; update display when plug/unplug sencond screen
+  (efs/run-in-background "autorandr --change --force")
+  ;; (message "Display config: %s" (string-trim (shell-command-to-string "autorandr --current")))
+)
+#+end_src
+
+
+* Ssh agent
+*getenv* is a built-in Emacs Lisp function that retrieves the value of an environment variable. It takes a string argument representing the name of the environment variable whose value you want to retrieve, and returns a string representing the value of that variable.
+
+*file-exists-p* is a built-in Emacs Lisp function that checks whether a file exists at a given path. It takes one argument, which is a string representing the file path to check. If the file exists, the function returns t. Otherwise, it returns nil.
+
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun sodcof/ssh-auth-sock-exists-p()
+  ;; check if SSH_AUTH_SOCK enviroment variable is set and points to a valid socket
+  (let ((auth-sock (getenv "SSH_AUTH_SOCK")))
+    (and auth-sock (file-exists-p auth-sock) auth-sock))
+)
+
+(defun sodcof/ssh-auth-enable()
+  (if (sodcof/ssh-auth-sock-exists-p)
+      (start-process-shell-command "ssh-agent" nil "ssh-agent")
+  )
+)
+#+end_src
+
+
+* Terminal
+** Ansiterm
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun sodcof/ansi-term-zsh ()
+  (interactive)
+  (ansi-term "/usr/bin/zsh")
+)
+
+(defun sodcof/ansi-term-bash ()
+  (interactive)
+  (ansi-term "/usr/bin/bash")
+)
+#+end_src
+
+* Nautilus
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun sodcof/nautilus ()
+  (interactive)
+  (start-process-shell-command "/usr/bin/nautilus" nil "/usr/bin/nautilus")
+)
+#+end_src
+
+* Exwm
+** Buffer name
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun efs/exwm-update-class ()
+  ;; Set the name of buffer to the name of oppened application
+  (exwm-workspace-rename-buffer exwm-class-name))
+
+
+(defun efs/exwm-update-title ()
+  ;; Improve buffer name
+  (pcase exwm-class-name
+    ("firefox" (exwm-workspace-rename-buffer (format "Firefox: %s" exwm-title)))))
+#+end_src
+
+** Arrange application by workspace
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun efs/config-window-by-class ()
+  ;; move application to workspace by the application name
+  ;; firefox go to space 2
+  ;; thunderbird go to space 3
+  ;; etc
+  (interactive)
+  (pcase exwm-class-name
+    ("firefox" (exwm-workspace-move-window 2)(exwm-workspace-switch-create 2))
+    ("thunderbird" (exwm-workspace-move-window 3)(exwm-workspace-switch-create 3))
+    ("ViberPC" (exwm-workspace-move-window 4)(exwm-workspace-switch-create 4))
+    ("TelegramDesktop" (exwm-workspace-move-window 4)(exwm-workspace-switch-create 4))
+    ("Postman" (exwm-workspace-move-window 5)(exwm-workspace-switch-create 5))
+    ("DBeaver" (exwm-workspace-move-window 6)(exwm-workspace-switch-create 6))
+    ("RESP.app - Developer GUI for Redis" (exwm-workspace-move-window 7)(exwm-workspace-switch-create 7))
+    ("VirtualBox Manager" (exwm-workspace-move-window 8)(exwm-workspace-switch-create 8))
+    ("Vmplayer" (exwm-workspace-move-window 8)(exwm-workspace-switch-create 8))
+    ("VirtualBox Machine" (exwm-workspace-move-window 9)(exwm-workspace-switch-create 9))
+))
+#+end_src
+
+
+** Config
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun efs/run-in-background (command)
+  (let ((command-parts (split-string command "[ ]+")))
+    (apply #'call-process `(,(car command-parts) nil 0 nil ,@(cdr command-parts)))))
+
+(defun efs/exwm-init-hook ()
+  ;; start some application by default
+  (sodcof/startup-program)
+)
+
+
+(use-package! exwm
+  :config
+  ;; Set the default number of workspaces
+  (setq exwm-workspace-number 10)
+
+  ;; When window "class" updates, use it to set the buffer name
+  (add-hook 'exwm-update-class-hook #'efs/exwm-update-class)
+
+  ;; When window title updates, use it to set the buffer name
+  (add-hook 'exwm-update-title-hook #'efs/exwm-update-title)
+
+  ;; Config window as they're created
+  (add-hook 'exwm-manage-finish-hook #'efs/config-window-by-class)
+
+  ;; Rebind CapsLock to Ctrl
+  ;; (start-process-shell-command "xmodmap" nil "xmodmap ~/.emacs.d/exwm/Xmodmap")
+
+  ;; When EXWM starts up, do some extra confifuration
+  (add-hook 'exwm-init-hook #'efs/exwm-init-hook)
+
+  ;; Set the screen resolution (update this to be the correct resolution for your screen!)
+  (require 'exwm-randr)
+  (exwm-randr-enable)
+
+  (sodcof/set-up-multiple-monitor)
+
+  ;; react to display connectivity changes, do initial display update
+  (add-hook 'exwm-randr-screen-change-hook #'efs/update-displays)
+  (efs/update-displays)
+
+  ;; set wallpaper
+  (efs/set-wallpaper)
+
+  ;; enable natural scroll
+  (sodcof/natural-scroll-activated)
+
+  ;; enable touchpad tapping
+  (sodcof/touchpad-tapping-activated)
+
+  ;; enable ssh-agent
+  (sodcof/ssh-auth-enable)
+
+  ;; Load the system tray before exwm-init
+  (require 'exwm-systemtray)
+  (setq exwm-systemtray-height 20)
+  (exwm-systemtray-enable)
+
+  ;; warp cursor
+  (setq exwm-workspace-warp-cursor t)
+
+  ;; These keys should always pass through to Emacs
+  ;; for example: when firefox is running in buffer
+  ;; press M-x will go to emacs not firefox
+  (setq exwm-input-prefix-keys
+    '(?\C-x ;; ?\C => Ctrl
+      ?\C-u
+      ?\C-h
+      ?\M-x
+      ?\M-`
+      ?\M-&
+      ?\M-:
+      ?\C-\M-j  ;; Buffer list
+      ?\C-\ ))  ;; Ctrl+Space
+
+  ;; Ctrl+Q will enable the next key to be sent directly
+  (define-key exwm-mode-map [?\C-q] 'exwm-input-send-next-key)
+
+  ;; Set up global key bindings.  These always work, no matter the input state!
+  ;; Keep in mind that changing this list after EXWM initializes has no effect.
+  (setq exwm-input-global-keys
+        `(
+          ;; Reset to line-mode (C-c C-k switches to char-mode via exwm-input-release-keyboard)
+          ([?\s-r] . exwm-reset)
+
+          ;; Move between windows
+          ([C-s-left] . windmove-left)
+          ([C-s-right] . windmove-right)
+          ([C-s-up] . windmove-up)
+          ([C-s-down] . windmove-down)
+
+          ;; Launch applications via shell command
+          ([?\s-&] . (lambda (command)
+                       (interactive (list (read-shell-command "$ ")))
+                       (start-process-shell-command command nil command)))
+
+          ;; Switch workspace
+          ([?\s-w] . exwm-workspace-switch)
+          ([?\s-`] . (lambda () (interactive) (exwm-workspace-switch-create 0)))
+
+          ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
+          ,@(mapcar (lambda (i)
+                      `(,(kbd (format "s-%d" i)) .
+                        (lambda ()
+                          (interactive)
+                          (exwm-workspace-switch-create ,i))))
+                    (number-sequence 0 9))))
+
+  (exwm-input-set-key (kbd "s-a") 'counsel-linux-app)
+  (exwm-input-set-key (kbd "s-e") 'sodcof/nautilus)
+  (exwm-input-set-key (kbd "s-t") 'sodcof/ansi-term-zsh)
+  (exwm-enable))
+#+end_src
+
+
+* Desktop notification
+#+begin_src conf :tangle ~/.config/dunst/dunstrc :mkdirp yes
+[global]
+    ### Display ###
+    monitor = 0
+
+    # The geometry of the window:
+    #   [{width}]x{height}[+/-{x}+/-{y}]
+    geometry = "500x10-10+50"
+
+    # Show how many messages are currently hidden (because of geometry).
+    indicate_hidden = yes
+
+    # Shrink window if it's smaller than the width.  Will be ignored if
+    # width is 0.
+    shrink = no
+
+    # The transparency of the window.  Range: [0; 100].
+    transparency = 10
+
+    # The height of the entire notification.  If the height is smaller
+    # than the font height and padding combined, it will be raised
+    # to the font height and padding.
+    notification_height = 0
+
+    # Draw a line of "separator_height" pixel height between two
+    # notifications.
+    # Set to 0 to disable.
+    separator_height = 1
+    separator_color = frame
+
+    # Padding between text and separator.
+    padding = 8
+
+    # Horizontal padding.
+    horizontal_padding = 8
+
+    # Defines width in pixels of frame around the notification window.
+    # Set to 0 to disable.
+    frame_width = 2
+
+    # Defines color of the frame around the notification window.
+    frame_color = "#89AAEB"
+
+    # Sort messages by urgency.
+    sort = yes
+
+    # Don't remove messages, if the user is idle (no mouse or keyboard input)
+    # for longer than idle_threshold seconds.
+    idle_threshold = 30
+
+    ### Text ###
+
+    font = Cantarell 20
+
+    # The spacing between lines.  If the height is smaller than the
+    # font height, it will get raised to the font height.
+    line_height = 0
+    markup = full
+
+    # The format of the message.  Possible variables are:
+    #   %a  appname
+    #   %s  summary
+    #   %b  body
+    #   %i  iconname (including its path)
+    #   %I  iconname (without its path)
+    #   %p  progress value if set ([  0%] to [100%]) or nothing
+    #   %n  progress value if set without any extra characters
+    #   %%  Literal %
+    # Markup is allowed
+    format = "<b>%s</b>\n%b"
+
+    # Alignment of message text.
+    # Possible values are "left", "center" and "right".
+    alignment = left
+
+    # Show age of message if message is older than show_age_threshold
+    # seconds.
+    # Set to -1 to disable.
+    show_age_threshold = 60
+
+    # Split notifications into multiple lines if they don't fit into
+    # geometry.
+    word_wrap = yes
+
+    # When word_wrap is set to no, specify where to make an ellipsis in long lines.
+    # Possible values are "start", "middle" and "end".
+    ellipsize = middle
+
+    # Ignore newlines '\n' in notifications.
+    ignore_newline = no
+
+    # Stack together notifications with the same content
+    stack_duplicates = true
+
+    # Hide the count of stacked notifications with the same content
+    hide_duplicate_count = false
+
+    # Display indicators for URLs (U) and actions (A).
+    show_indicators = yes
+
+    ### Icons ###
+
+    # Align icons left/right/off
+    icon_position = left
+
+    # Scale larger icons down to this size, set to 0 to disable
+    max_icon_size = 88
+
+    # Paths to default icons.
+    icon_path = /usr/share/icons/Adwaita/96x96/status:/usr/share/icons/Adwaita/96x96/emblems
+
+    ### History ###
+
+    # Should a notification popped up from history be sticky or timeout
+    # as if it would normally do.
+    sticky_history = no
+
+    # Maximum amount of notifications kept in history
+    history_length = 20
+
+    ### Misc/Advanced ###
+
+    # Browser for opening urls in context menu.
+    browser = qutebrowser
+
+    # Always run rule-defined scripts, even if the notification is suppressed
+    always_run_script = true
+
+    # Define the title of the windows spawned by dunst
+    title = Dunst
+
+    # Define the class of the windows spawned by dunst
+    class = Dunst
+
+    startup_notification = false
+    verbosity = mesg
+
+    # Define the corner radius of the notification window
+    # in pixel size. If the radius is 0, you have no rounded
+    # corners.
+    # The radius will be automatically lowered if it exceeds half of the
+    # notification height to avoid clipping text and/or icons.
+    corner_radius = 4
+
+    mouse_left_click = close_current
+    mouse_middle_click = do_action
+    mouse_right_click = close_all
+
+# Experimental features that may or may not work correctly. Do not expect them
+# to have a consistent behaviour across releases.
+[experimental]
+    # Calculate the dpi to use on a per-monitor basis.
+    # If this setting is enabled the Xft.dpi value will be ignored and instead
+    # dunst will attempt to calculate an appropriate dpi value for each monitor
+    # using the resolution and physical size. This might be useful in setups
+    # where there are multiple screens with very different dpi values.
+    per_monitor_dpi = false
+
+[shortcuts]
+
+    # Shortcuts are specified as [modifier+][modifier+]...key
+    # Available modifiers are "ctrl", "mod1" (the alt-key), "mod2",
+    # "mod3" and "mod4" (windows-key).
+    # Xev might be helpful to find names for keys.
+
+    # Close notification.
+    #close = ctrl+space
+
+    # Close all notifications.
+    #close_all = ctrl+shift+space
+
+    # Redisplay last message(s).
+    # On the US keyboard layout "grave" is normally above TAB and left
+    # of "1". Make sure this key actually exists on your keyboard layout,
+    # e.g. check output of 'xmodmap -pke'
+    history = ctrl+grave
+
+    # Context menu.
+    context = ctrl+shift+period
+
+[urgency_low]
+    # IMPORTANT: colors have to be defined in quotation marks.
+    # Otherwise the "#" and following would be interpreted as a comment.
+    background = "#222222"
+    foreground = "#888888"
+    timeout = 10
+    # Icon for notifications with low urgency, uncomment to enable
+    #icon = /path/to/icon
+
+[urgency_normal]
+    background = "#1c1f26"
+    foreground = "#ffffff"
+    timeout = 10
+    # Icon for notifications with normal urgency, uncomment to enable
+    #icon = /path/to/icon
+
+[urgency_critical]
+    background = "#900000"
+    foreground = "#ffffff"
+    frame_color = "#ff0000"
+    timeout = 0
+    # Icon for notifications with critical urgency, uncomment to enable
+    #icon = /path/to/icon
+#+end_src
+
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun sodcof/disable-desktop-notification()
+  (interactive)
+  (start-process-shell-command "notify-send" nil "notify-send \"DUNST_COMMAND_PAUSE\"")
+)
+
+(defun sodcof/enable-desktop-notification()
+  (interactive)
+  (start-process-shell-command "notify-send" nil "notify-send \"DUNST_COMMAND_RESUME\"")
+)
+
+(defun sodcof/toggle-desktop-notification()
+  (interactive)
+  (start-process-shell-command "notify-send" nil "notify-send \"DUNST_COMMAND_TOGGLE\"")
+)
+#+end_src
+
+
+* Desktop environment
+#+begin_src emacs-lisp :tangle ./desktop.el
+(use-package! desktop-environment
+  :after exwm
+  :config (desktop-environment-mode)
+  :custom
+  (desktop-environment-brightness-small-increment "2%+")
+  (desktop-environment-brightness-small-decrement "2%-")
+  (desktop-environment-brightness-normal-increment "5%+")
+  (desktop-environment-brightness-normal-decrement "5%-"))
+
+#+end_src
+
+
+* Startup program
+#+begin_src emacs-lisp :tangle ./desktop.el
+(defun sodcof/startup-program()
+  (exwm-workspace-switch-create 4)
+  (split-window-right)
+  (windmove-right)
+
+  (start-process-shell-command "thunderbird" nil "thunderbird")
+  (start-process-shell-command "dropbox" nil "dropbox start -i")
+  (start-process-shell-command "viber" nil "/opt/viber/Viber")
+  (start-process-shell-command "telegram-desktop" nil "telegram-desktop")
+
+
+  ;; Launch app that will run in the background
+  (efs/run-in-background "dunst")
+  (efs/run-in-background "nm-applet")
+  (efs/run-in-background "pasystray")
+  (efs/run-in-background "blueman-applet")
+)
+#+end_src

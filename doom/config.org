@@ -1,0 +1,723 @@
+#+title: Doom Emacs Config
+#+PROPERTY: header-args:emacs-lisp :tangle ./config.el
+
+* Startup
+Make startup faster by reducing the frequency of garbage collection and then use a hook to measure Emacs startup time.
+#+begin_src emacs-lisp
+;; The default is 800 kilobytes.  Measured in bytes.
+(setq gc-cons-threshold (* 50 1000 1000))
+
+;; Profile emacs startup
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "*** Emacs loaded in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+#+end_src
+
+* Identify
+#+begin_src emacs-lisp
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
+
+;; Place your private configuration here! Remember, you do not need to run 'doom
+;; sync' after modifying this file!
+
+
+;; Some functionality uses this to identify you, e.g. GPG configuration, email
+;; clients, file templates and snippets. It is optional.
+(setq user-full-name "duyle"
+      user-mail-address "duyleitbka95@gmail.com")
+
+;; Whenever you reconfigure a package, make sure to wrap your config in an
+;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
+;;
+;;   (after! PACKAGE
+;;     (setq x y))
+;;
+;; The exceptions to this rule:
+;;
+;;   - Setting file/directory variables (like `org-directory')
+;;   - Setting variables which explicitly tell you to set them before their
+;;     package is loaded (see 'C-h v VARIABLE' to look up their documentation).
+;;   - Setting doom variables (which start with 'doom-' or '+').
+;;
+;; Here are some additional functions/macros that will help you configure Doom.
+;;
+;; - `load!' for loading external *.el files relative to this one
+;; - `use-package!' for configuring packages
+;; - `after!' for running code after a package has loaded
+;; - `add-load-path!' for adding directories to the `load-path', relative to
+;;   this file. Emacs searches the `load-path' when you load packages with
+;;   `require' or `use-package'.
+;; - `map!' for binding new keys
+;; - `:init' used to specify code that should be executed when the package is first loaded.
+;;    The code runs when the package is loaded during Emacs startup
+;;    Usecase:  setting package-specific variables
+;;              adding hooks for modes associated with the package
+;;              loading additional configuration files or functions specific to the package.
+;;
+;; - `:config' used to specify code that should be executed after the package is loaded.
+;;    The code runs after the package is loaded during Emacs startup
+;;    Usecase: customizing keybindings
+;;             setting package-specific variables
+;;             configuring package behavior
+;;             applying theme changes.
+;;
+;; - `:defer t' used to specify that the loading of package should be deferred,
+;;   meaning it will not be loaded until it's explicitly requested or needed.
+;;   It helps to reduce the startup time of Emacs because packages are loaded on-demand,
+;;   rather than all at once when Emacs start
+;;
+;; To get information about any of these functions/macros, move the cursor over
+;; the highlighted symbol at press 'K' (non-evil users must press 'C-c c k').
+;; This will open documentation for it, including demos of how they are used.
+;; Alternatively, use `C-h o' to look up a symbol (functions, variables, faces,
+;; etc).
+;;
+;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
+;; they are implemented.
+#+end_src
+
+* Global set key
+#+begin_src emacs-lisp
+(global-set-key (kbd "s-h") 'dap-hydra)
+(global-set-key (kbd "s-o") 'treemacs-narrow-to-current-file)
+(global-set-key (kbd "s-c") 'treemacs-add-and-display-current-project-exclusively)
+(global-set-key (kbd "s-s") 'lsp-treemacs-symbols)
+(global-set-key (kbd "s-b") 'switch-to-buffer)
+#+end_src
+
+* UI Configuration
+#+begin_src emacs-lisp
+;; Doom exposes five (optional) variables for controlling fonts in Doom:
+;;
+;; - `doom-font' -- the primary font to use
+;; - `doom-variable-pitch-font' -- a non-monospace font (where applicable)
+;; - `doom-big-font' -- used for `doom-big-font-mode'; use this for
+;;   presentations or streaming.
+;; - `doom-unicode-font' -- for unicode glyphs
+;; - `doom-serif-font' -- for the `fixed-pitch-serif' face
+;;
+;; See 'C-h v doom-font' for documentation and more examples of what they
+;; accept. For example:
+;;
+;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
+;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
+;;
+;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
+;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
+;; refresh your font settings. If Emacs still can't find your font, it likely
+;; wasn't installed correctly. Font issues are rarely Doom issues!
+
+;; There are two ways to load a theme. Both assume the theme is installed and
+;; available. You can either set `doom-theme' or manually load a theme with the
+;; `load-theme' function. This is the default:
+(setq doom-theme 'doom-one)
+;; (setq debug-on-error t)
+
+;; This determines the style of line numbers in effect. If set to `nil', line
+;; numbers are disabled. For relative line numbers, set this to `relative'.
+(setq display-line-numbers-type t)
+
+;; VISUAL
+(use-package! all-the-icons)
+(use-package! all-the-icons-dired
+  :after all-the-icons
+  :hook (dired-mode . all-the-icons-dired-mode)
+)
+
+(use-package! diminish
+  :config
+  (diminish 'visual-line-mode)
+)
+
+(use-package! dimmer
+  ;; dim the inactive window
+  :custom (dimmer-fraction 0.2) ;; the bigger the dimmer-fraction is, the darker the inactive windown is
+  :config
+  (dimmer-mode 1)
+)
+
+(use-package! paren
+  :config
+  (show-paren-mode t)
+  :custom
+  (show-paren-style 'expression)
+)
+
+(use-package! rainbow-delimiters
+  :hook ((prog-mode . rainbow-delimiters-mode))
+)
+#+end_src
+
+
+* Savehist
+#+begin_src emacs-lisp
+(use-package! savehist
+  :config
+  (setq history-length 25)
+  (savehist-mode t)
+)
+#+end_src
+
+* Search
+#+begin_src emacs-lisp
+(after! vertico
+  (setq vertico-count 17)
+  (vertico-mode +1))
+
+;; (use-package! vertico-posframe
+;;   :config
+;;   (vertico-posframe-mode 1))
+
+(after! marginalia
+  (marginalia-mode +1))
+
+;; Configure project search preview
+(after! consult
+  ;; Enable automatic preview at point
+  (consult-preview-at-point-mode)
+
+  ;; Configure preview for ripgrep (project search)
+  (setq consult-ripgrep-args "rg --null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --line-number --hidden --with-filename")
+
+  ;; Enable preview for project search
+  (setq consult-preview-key 'any) ;; Press Alt + . for search preview
+  (setq consult-preview-raw-size 1024000)
+  (setq consult-preview-max-size 1024000)
+  (setq consult-preview-delay 0.1)
+
+  ;; Configure where the preview window appears
+  (setq consult--preview-function #'consult--preview-top)
+  (setq consult-preview-variants
+        '(consult--preview-top
+          consult--preview-bottom
+          consult--preview-right))
+)
+
+#+end_src
+
+* Magit
+#+begin_src emacs-lisp
+;; shows a TODOs section in your git status buffer containing all lines with TODO
+(use-package magit-todos
+  :defer t)
+#+end_src
+
+
+* Treemacs
+#+begin_src emacs-lisp
+(use-package! treemacs
+  ;; :hook (treemacs . 'treemacs-display-current-project-exclusively)
+  :config
+  ;; M-x treemacs-load-theme to set theme for treemacs
+  (setq doom-themes-treemacs-theme 'Idea
+        treemacs-tag-follow-delay 1)
+  (treemacs-follow-mode t)
+  ;; (treemacs-tag-follow-mode t)
+  (treemacs-fringe-indicator-mode 'always)
+
+)
+
+;; (defun display-current-project()
+;;     (message "treemacs-mode-hook `%s'" (current-buffer))
+;;     (treemacs-add-and-display-current-project-exclusively)
+;; )
+;;
+;; (add-hook 'treemacs-mode-hook #'display-current-project)
+
+
+(use-package! treemacs-projectile
+  :after (treemacs projectile)
+)
+
+(use-package! treemacs-magit
+  :after (treemacs magit)
+)
+#+end_src
+
+
+* PDF
+#+begin_src emacs-lisp
+(use-package! pdf-tools
+  :mode ("\\.pdf\\'" . pdf-view-mode)
+  :config
+  (setq pdf-view-display-size 'fit-page)
+  (setq pdf-view-resize-factor 1.1)
+  (setq pdf-continuous-scroll-mode t)
+)
+#+end_src
+
+
+* Mode line
+#+begin_src emacs-lisp
+;; Run nerd-icons-install-fonts to install fonts for modeline
+(after! doom-modeline
+  (setq doom-modeline-buffer-encoding nil)
+  ;; (setq doom-modeline-env-enable-python nil)
+
+  (setq display-time-default-load-average nil)      ; don't show load average
+  (display-battery-mode 1)
+  (setq display-time-day-and-date t)
+  (display-time-mode 1)
+)
+#+end_src
+
+
+* Terminal
+** Vterm
+- Set default shell to zsh
+  #+begin_src emacs-lisp
+ (after! vterm
+   (setq vterm-shell "/bin/zsh"))
+  #+end_src
+
+
+* Lsp mode
+** Ignore files watch
+#+begin_src emacs-lisp
+(with-eval-after-load 'lsp-mode
+  (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\env3\\'")
+  ;; or
+  ;; (add-to-list 'lsp-file-watch-ignored-files "[/\\\\]\\.my-files\\'")
+)
+#+end_src
+
+** Clangd
+#+begin_src emacs-lisp
+(after! lsp-clangd
+  (setq lsp-clangd-binary-path "~/.config/emacs/.local/etc/lsp/clangd/clangd_20.1.0/bin/clangd"))
+#+end_src
+
+* Dap mode
+#+begin_src emacs-lisp
+(use-package! dap-mode
+  ;; :init
+  ;; code here will be run immediately
+  :config
+  ;; code here will be run after the package is loaded
+
+  ;; (setq dap-ui-buffer-configurations
+  ;;     `((,"*dap-ui-locals*"  . ((side . right) (slot . 1) (window-width . 0.50))) ;; changed this to 0.50
+  ;;       (,"*dap-ui-repl*" . ((side . right) (slot . 1) (window-width . 0.50))) ;; added this! TODO enable when release on MELPA
+  ;;       (,"*dap-ui-expressions*" . ((side . right) (slot . 2) (window-width . 0.20)))
+  ;;       (,"*dap-ui-sessions*" . ((side . right) (slot . 3) (window-width . 0.20)))
+  ;;       (,"*dap-ui-breakpoints*" . ((side . left) (slot . 2) (window-width . , 0.20)))
+  ;;       (,"*debug-window*" . ((side . bottom) (slot . 3) (window-width . 0.20)))))
+
+  (dap-ui-mode 1)
+  (dap-ui-many-windows-mode 1)
+  ;; enables mouse hover support
+  (dap-tooltip-mode 1)
+  ;; use tooltips for mouse hover
+  ;; if it is not enabled `dap-mode' will use the minibuffer.
+  (tooltip-mode 1)
+  ;; displays floating panel with debug buttons
+  ;; requies emacs 26+
+  (dap-ui-controls-mode 1)
+  ;; golang
+  (require 'dap-dlv-go)
+  ;; cpp https://github.com/emacs-lsp/lsp-mode/blob/master/docs/tutorials/CPP-guide.md#lsp-mode-configuration
+  (require 'dap-cpptools)
+)
+#+end_src
+
+** Python
+#+begin_src emacs-lisp
+(after! dap-mode
+  (require 'dap-python)
+  (setq dap-python-executable "python3")
+  (setq dap-python-debugger 'debugpy)
+
+  ;; Eval Buffer with `M-x eval-buffer' to register the newly created template.
+  (dap-register-debug-template
+   "Django: Debug Template"
+   (list :type "python"
+         :args "runserver --noreload 8083" ;; update
+         :cwd (lsp-workspace-root)
+         :request "launch"
+         :name "Django: Debug Template"
+         :program "manage.py"
+         ;; :env '(("PYTHONPATH" . "env3/bin/python"))
+         ;; :pythonPath "venv/bin/python" ;; update to the path to virtual environment
+         :django t))
+
+  (dap-register-debug-template
+   "Celery: Debug Template"
+   (list :type "python"
+         :cwd (lsp-workspace-root)
+         :request "launch"
+         :name "Celery: Celery Easm"
+         :program ".direnv/python-3.7.16/bin/celery" ;; update path to celery
+         :args "--app=app worker --hostname=scan-node@%%n -l info -Q scan --purge --without-mingle --without-gossip --without-heartbeat -Ofair" ;; update module name
+         :django t))
+)
+#+end_src
+
+*** Django template
+*--noreload* in *args* to set the autoreload off check function at the path *{virtual_env}/site-packages/django/core/management/commands/runserver.py::run()* variable *use_reload = False*
+
+** Golang
+#+begin_src emacs-lisp
+(after! dap-dlv-go
+  ;; Eval Buffer with `M-x eval-buffer' to register the newly created template.
+  (dap-register-debug-template
+   "Go: Custom Launch File"
+   (list :type "go"
+         :cwd (lsp-workspace-root)
+         :request "launch"
+         :name "Go: Custom Launch File"
+         :mode "auto"
+         :program "main.go"
+         :buildFlags nil
+         :args nil
+         :env nil))
+
+  (dap-register-debug-template
+   "Go: Benchmark Template"
+   (list :type "go"
+         :request "launch"
+         :name "Go: Benchmark Template"
+         :mode "test"
+         :program nil
+         :args "-test.bench=BenchmarkXXX"
+         :env nil))
+
+)
+#+end_src
+
+** C/C++
+*** Debug template for C/C++
+
+Reference: https://github.com/emacs-lsp/lsp-mode/blob/master/docs/tutorials/CPP-guide.md#debugging
+#+begin_src emacs-lisp
+;; Template for debug C/C++
+(dap-register-debug-template
+  "cpptools: Debug Template"
+  (list :type "cppdbg"
+        :request "launch"
+        :name "cpptools: Debug Template"
+        :MIMode "gdb"
+        :program "${workspaceFolder}/main.c"
+        :cwd "${workspaceFolder}"))
+#+end_src
+
+
+*** Debug template for C/C++ with root permissions
+#+begin_src emacs-lisp
+;; Template for debug C/C++ with root permissions
+(dap-register-debug-template
+ "C++ Debug With Root Permission"
+ (list :type "cppdbg"
+       :request "launch"
+       :name "C++ Debug"
+       :program "main"
+       :stopOnEntry t
+       :cwd (lsp-workspace-root)
+       :externalConsole nil
+       :args '("-arg1" "value1" "-arg2" "value2")
+       :MIMode "gdb"
+       :setupCommands nil
+       :miDebuggerPath (format "%s/gdb_root.sh" (lsp-workspace-root))
+       ))
+
+#+end_src
+
+**** File gdb_root.sh
+#+begin_src shell
+
+#!/bin/bash
+SELF_PATH=$(realpath -s "$0")
+
+if [[ "$SUDO_ASKPASS" = "$SELF_PATH" ]]; then
+    zenity --password --title="$1"
+else
+    exec env SUDO_ASKPASS="$SELF_PATH" sudo -A /usr/bin/gdb $@
+fi
+#+end_src
+
+
+* Golang
+#+begin_src emacs-lisp
+(after! go-mode
+  (setq gofmt-command "goimports")
+  (add-hook 'before-save-hook 'gofmt-before-save))
+#+end_src
+
+
+* C/C++
+#+begin_src emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c-mode))
+(add-to-list 'auto-mode-alist '("\\.hpp\\'" . c++-mode))
+#+end_src
+
+
+* Undo
+#+begin_src emacs-lisp
+(use-package! undo-tree
+  :config
+  (global-undo-tree-mode +1)
+)
+#+end_src
+
+
+* Engine mode
+#+begin_src emacs-lisp
+(use-package! engine-mode
+  :config
+  (setq engine/browser-function 'browse-url-firefox)
+  (defengine google
+    "http://www.google.com/search?ie=utf-8&oe=utf-8&q=%s")
+  (engine-mode 1)
+)
+#+end_src
+
+* Org mode
+** Font faces
+#+begin_src emacs-lisp
+(defun efs/org-font-setup ()
+  ;; Replace list hyphen with dot
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•")))))))
+#+end_src
+
+** Nicer Heading Bullets
+#+begin_src emacs-lisp
+(use-package! org-bullets
+  :after org
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+#+end_src
+
+** Configure
+#+begin_src emacs-lisp
+(defun efs/org-mode-setup ()
+  (org-indent-mode)
+  ;; (variable-pitch-mode 1)
+  (visual-line-mode 1) ;; wrap line
+)
+
+(use-package! org
+  :hook (org-mode . efs/org-mode-setup)
+  :config
+  (setq org-ellipsis " ▾"
+        org-hide-emphasis-markers t)
+
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
+  (setq org-agenda-files
+        '("~/Code/org/tasks.org"
+          "~/Code/org/birthdays.org"))
+
+  (setq org-todo-keywords
+    '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+      (sequence "BACKLOG(b)" "PLAN(p)" "READY(r)" "ACTIVE(a)" "REVIEW(v)" "WAIT(w@/!)" "HOLD(h)" "|" "COMPLETED(c)" "CANC(k@)")))
+
+  ;; Configure custom agenda views
+  (setq org-agenda-custom-commands
+   '(("d" "Dashboard"
+     ((agenda "" ((org-deadline-warning-days 7)))
+      (todo "NEXT"
+        ((org-agenda-overriding-header "Next Tasks")))
+      (tags-todo "agenda/ACTIVE" ((org-agenda-overriding-header "Active Projects")))))
+
+    ("n" "Next Tasks"
+     ((todo "NEXT"
+        ((org-agenda-overriding-header "Next Tasks")))))
+
+    ("W" "Work Tasks" tags-todo "+work-email")
+
+    ;; Low-effort next actions
+    ("e" tags-todo "+TODO=\"NEXT\"+Effort<15&+Effort>0"
+     ((org-agenda-overriding-header "Low Effort Tasks")
+      (org-agenda-max-todos 20)
+      (org-agenda-files org-agenda-files)))
+
+    ("w" "Workflow Status"
+     ((todo "WAIT"
+            ((org-agenda-overriding-header "Waiting on External")
+             (org-agenda-files org-agenda-files)))
+      (todo "REVIEW"
+            ((org-agenda-overriding-header "In Review")
+             (org-agenda-files org-agenda-files)))
+      (todo "PLAN"
+            ((org-agenda-overriding-header "In Planning")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
+      (todo "BACKLOG"
+            ((org-agenda-overriding-header "Project Backlog")
+             (org-agenda-todo-list-sublevels nil)
+             (org-agenda-files org-agenda-files)))
+      (todo "READY"
+            ((org-agenda-overriding-header "Ready for Work")
+             (org-agenda-files org-agenda-files)))
+      (todo "ACTIVE"
+            ((org-agenda-overriding-header "Active Projects")
+             (org-agenda-files org-agenda-files)))
+      (todo "COMPLETED"
+            ((org-agenda-overriding-header "Completed Projects")
+             (org-agenda-files org-agenda-files)))
+      (todo "CANC"
+            ((org-agenda-overriding-header "Cancelled Projects")
+             (org-agenda-files org-agenda-files)))))))
+
+  (setq org-refile-targets
+    '(("archive.org" :maxlevel . 1)
+      ("tasks.org" :maxlevel . 1)))
+
+  ;; Save Org buffers after refiling!
+  (advice-add 'org-refile :after 'org-save-all-org-buffers)
+
+  (setq org-tag-alist
+    '((:startgroup)
+       ; Put mutually exclusive tags here
+       (:endgroup)
+       ("@errand" . ?E)
+       ("@home" . ?H)
+       ("@work" . ?W)
+       ("agenda" . ?a)
+       ("planning" . ?p)
+       ("publish" . ?P)
+       ("batch" . ?b)
+       ("note" . ?n)
+       ("idea" . ?i)))
+
+  (efs/org-font-setup))
+
+(defun efs/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+; (use-package! visual-fill-column
+;   :hook (org-mode . efs/org-mode-visual-fill))
+
+#+end_src
+
+** Display image inline
+#+begin_src emacs-lisp
+(use-package! org
+  :config
+  (setq org-startup-with-inline-images t)
+)
+#+end_src
+
+** Configure Babel Language
+#+begin_src emacs-lisp
+(org-babel-do-load-languages
+  'org-babel-load-languages
+  '((emacs-lisp . t)
+    (python . t)))
+#+end_src
+
+** Auto-tangle Configuration Files
+This snippet adds a hook to org-mode buffers so that efs/org-babel-tangle-config gets executed each time such a buffer gets saved. This function checks to see if the file being saved is the Emacs.org file you’re looking at right now, and if so, automatically exports the configuration here to the associated output files.
+#+begin_src emacs-lisp
+(defun efs/org-babel-tangle-config ()
+  (when (string-equal (file-name-directory (buffer-file-name))
+                      (expand-file-name "~/.config/doom/"))
+    ;; Dynamic scoping to the rescue
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+#+end_src
+
+* Useful function
+** Arrayify
+Source: https://news.ycombinator.com/item?id=22129636
+#+begin_src emacs-lisp
+(defun arrayify (start end quote)
+  "Turn strings on newlines into a QUOTEd, comma-separated one-liner."
+  (interactive "r\nMQuote: ")
+  (let ((insertion
+         (mapconcat
+          (lambda (x) (format "%s%s%s" quote x quote))
+          (split-string (buffer-substring start end)) ", ")))
+    (delete-region start end)
+    (insert insertion)))
+#+end_src
+** Env Format To Camelcase
+#+begin_src emacs-lisp
+(defun sodcof/convert-env-format-to-camel-case(str)
+  "Convert string in env format to camel case for example SERVICE_PORT -> servicePort"
+  (let ((result "")
+        (str-length (length str))
+        (capitalize-next nil)
+    )
+    (dotimes (i str-length result)
+      (let ((c (aref str i)))
+        (if capitalize-next
+            (progn
+              ;; capitalize-next is true
+              ;; capitalize it
+              (setq result (concat result (upcase (char-to-string (aref str i)))))
+              (setq capitalize-next nil)
+            )
+
+            (progn
+              ;; capitalize-next is false
+              ;; check if is a _, if yes set capitalize-next to true
+              ;; else downcase it
+              (if (equal c ?_) ;; ?_ is equivalent to  (string-to-char "_")
+                (setq capitalize-next t)
+              (setq result (concat result (downcase (char-to-string c)))))))))))
+
+(defun sodcof/env-format-to-camel-case(start end)
+  "Turn string in env format to camel case for example SERVICE_PORT -> servicePort"
+  (interactive "r") ;; "r" pass 2 arguments to function the selected region, the start and end of region
+  (let ((replaced-string (buffer-substring start end)))
+        ; (message "replaced-string %s" replaced-string)
+        (delete-region start end)
+        (insert (sodcof/convert-env-format-to-camel-case replaced-string))))
+#+end_src
+
+
+** Camelcase To Env Format
+#+begin_src emacs-lisp
+(defun sodcof/convert-camel-case-to-env-format(str)
+  (let ((result "")
+        (str-length (length str)))
+    (dotimes (i str-length result)
+      (let ((c (aref str i)))
+        (if (and (>= c ?A)(<= c ?Z))
+            (progn
+              ;; c is uppercase
+              (setq result (concat result "_"))
+              (setq result (concat result (char-to-string c)))
+            )
+          ;; c is lowercase
+          (setq result (concat result (upcase (char-to-string c)))))))))
+
+(defun sodcof/camel-case-to-env-format(start end)
+  "Turn string in camel case format to env format for example servicePort -> SERVICE_PORT"
+  (interactive "r")
+  (let ((replaced-string (buffer-substring start end)))
+    (delete-region start end)
+    (insert (sodcof/convert-camel-case-to-env-format replaced-string))
+  )
+)
+#+end_src
+
+** Convert json to string
+#+begin_src emacs-lisp
+(require 'json)
+
+(defun sodcof/json-to-string (start end)
+  "Convert JSON object in the selected region to a JSON string.
+The region is specified by START and END positions."
+  (interactive "r") ;; Make function interactive and use the region
+  (let* ((json-input (buffer-substring-no-properties start end)) ;; Extract selected JSON
+         (parsed-json (json-parse-string json-input)) ;; Parse the JSON
+         (json-encoding-pretty-print nil) ;; Disable pretty-print for compact output
+         (json-string (json-encode parsed-json))) ;; Convert back to JSON string
+    (message "JSON String: %s" json-string) ;; Show in minibuffer
+    (kill-new json-string) ;; Copy to clipboard
+    (with-output-to-temp-buffer "*JSON String*"
+      (princ json-string)))) ;; Output to a temporary buffer
+#+end_src
