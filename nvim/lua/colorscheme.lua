@@ -6,3 +6,6 @@ if not is_ok then
     vim.notify('colorscheme ' .. colorscheme .. ' not found!')
     return
 end
+
+-- guibg: GUI background
+vim.cmd.highlight({ "Normal", "guibg=NONE" })
