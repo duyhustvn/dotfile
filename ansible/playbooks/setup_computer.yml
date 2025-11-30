@@ -1,6 +1,6 @@
 ---
 - name: Setup Computer
-  hosts: all
+  hosts: localhost
   become: true
   gather_facts: true
 
