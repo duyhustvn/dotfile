@@ -1,0 +1,26 @@
+- name: Install packages
+  become: true
+  apt:
+    name:
+      # UI
+      - fonts-powerline
+      # Clipboard
+      - wl-clipboard
+      # Java
+      - openjdk-21-jdk
+      # Python
+      - python3-debugpy
+      - python3-pip
+      # Build tools
+      - build-essential 
+      - cmake 
+      # Development tools
+      - git 
+      - htop
+      - wget 
+      - curl 
+      - ripgrep
+      - libtool-bin
+      
+    state: present
+    update_cache: yes

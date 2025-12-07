@@ -2,17 +2,14 @@
   become: true
   apt:
     name:
-      # UI
-      - fonts-powerline
       # Clipboard
       - wl-clipboard
       # Java
-      - openjdk-21-jdk
+      - jdk21-openjdk
       # Python
-      - python3-debugpy
-      - python3-pip
+      - python-pip
       # Build tools
-      - build-essential 
+      - base-devel
       - cmake 
       # Development tools
       - git 
@@ -20,7 +17,7 @@
       - wget 
       - curl 
       - ripgrep
-      - libtool-bin
+      - libtool
       
     state: present
     update_cache: yes
