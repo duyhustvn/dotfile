@@ -18,6 +18,12 @@
       - curl 
       - ripgrep
       - libtool
+      - unzip
+
+      # Programming language
+      - nodejs
+      - npm
       
+      - clang
     state: present
     update_cache: yes

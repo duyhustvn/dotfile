@@ -21,6 +21,8 @@
       - curl 
       - ripgrep
       - libtool-bin
+      - unzip
       
+     
     state: present
     update_cache: yes
