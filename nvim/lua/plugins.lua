@@ -70,4 +70,12 @@ require("lazy").setup({
       "nvim-tree/nvim-web-devicons", 
       opts = {},
     },
+
+    {
+        "rust-lang/rust.vim",
+        ft = "rust",
+        init = function ()
+          vim.g.rustfmt_autosave = 1
+        end
+    },
 })
