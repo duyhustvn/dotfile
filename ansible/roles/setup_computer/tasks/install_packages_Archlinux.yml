@@ -1,0 +1,29 @@
+- name: Install packages
+  become: true
+  apt:
+    name:
+      # Clipboard
+      - wl-clipboard
+      # Java
+      - jdk21-openjdk
+      # Python
+      - python-pip
+      # Build tools
+      - base-devel
+      - cmake 
+      # Development tools
+      - git 
+      - htop
+      - wget 
+      - curl 
+      - ripgrep
+      - libtool
+      - unzip
+
+      # Programming language
+      - nodejs
+      - npm
+      
+      - clang
+    state: present
+    update_cache: yes

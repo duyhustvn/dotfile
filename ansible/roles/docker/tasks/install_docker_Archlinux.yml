@@ -24,21 +24,20 @@
 - block:
     - name: Update pacman package cache
       community.general.pacman:
-        update_cache: true
-      # This task runs "pacman -Sy" as a separate step
+        update_cache: true # pacman -Sy
 
     - name: Install Docker package
       community.general.pacman:
-        name: docker
+        name: 
+          - docker
+          - docker-compose
         state: present
-      # This installs the 'docker' package from the Arch repositories
 
     - name: Ensure Docker service is enabled and started
       ansible.builtin.systemd_service:
         name: docker.service
         state: started
-        enabled: true
-      # This is equivalent to 'systemctl enable --now docker.service'
+        enabled: true 
 
 # - block:
 #     - name: Set environment variables for Docker proxy

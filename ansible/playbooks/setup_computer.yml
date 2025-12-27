@@ -26,5 +26,6 @@
       when: (proxy | default('')) | trim == ""
 
   roles:
+    - setup_computer
     - docker
     - golang
