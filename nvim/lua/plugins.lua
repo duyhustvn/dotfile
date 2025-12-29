@@ -78,4 +78,16 @@ require("lazy").setup({
           vim.g.rustfmt_autosave = 1
         end
     },
+
+    {
+      "dart-lang/dart-vim-plugin",
+      ft = "dart",
+      init = function()
+        vim.g.dart_format_on_save = 1
+      end,
+    },
+
+    {
+        "nvim-flutter/flutter-tools.nvim",
+    },
 })
