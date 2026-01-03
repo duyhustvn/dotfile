@@ -12,17 +12,19 @@
       - python3-debugpy
       - python3-pip
       # Build tools
-      - build-essential 
-      - cmake 
+      - build-essential
+      - cmake
       # Development tools
-      - git 
+      - git
       - htop
-      - wget 
-      - curl 
+      - wget
+      - curl
       - ripgrep
       - libtool-bin
       - unzip
-      
-     
+
+      # Formatter
+      - clang-format
+
     state: present
     update_cache: yes
