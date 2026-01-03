@@ -100,6 +100,8 @@ require("lazy").setup({
 				formatters_by_ft = {
 					-- Lua
 					lua = { "stylua" },
+					-- Conform will run multiple formatters sequentially
+					go = { "goimports", "gofmt" },
 					-- C/C++
 					c = { "clang-format" },
 					cpp = { "clang-format" },
