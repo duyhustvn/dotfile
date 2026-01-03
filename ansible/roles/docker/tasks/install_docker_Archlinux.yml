@@ -1,25 +1,7 @@
 - block:
-    - name: Create directory for Docker daemon config
-      file:
-        path: /etc/docker
-        state: directory
-        mode: '0644'
-        owner: root
-        group: root
-
-    - name: Set docker root data
-      copy:
-        dest: /etc/docker/daemon.json
-        content: |
-          {
-            "data-root": "{{ docker_data_root }}",
-            "log-driver": "json-file",
-            "log-opts": {
-              "max-size": "{{ docker_log_max_size }}",
-              "max-file": "{{ docker_log_max_file }}"
-            }
-          }
-      when: docker_data_root is defined and docker_data_root != ""
+    - name: Setup data root for docker
+      include_tasks: setup_data_root.yml
+  when: docker_data_root is defined and docker_data_root != ""
 
 - block:
     - name: Update pacman package cache
@@ -28,7 +10,7 @@
 
     - name: Install Docker package
       community.general.pacman:
-        name: 
+        name:
           - docker
           - docker-compose
         state: present
@@ -37,8 +19,7 @@
       ansible.builtin.systemd_service:
         name: docker.service
         state: started
-        enabled: true 
-
+        enabled: true
 # - block:
 #     - name: Set environment variables for Docker proxy
 #       copy:
@@ -49,10 +30,10 @@
 #           Environment="HTTPS_PROXY={{ proxy }}"
 #           Environment="NO_PROXY={{ no_proxy }}"
 #       when: proxy is defined and proxy != ""
-# 
+#
 #     - name: Reload systemd manager configuration
 #       command: systemctl daemon-reload
-# 
+#
 #     - name: Restart Docker to apply proxy config
 #       service:
 #         name: docker

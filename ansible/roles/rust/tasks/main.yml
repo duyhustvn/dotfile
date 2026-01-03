@@ -3,4 +3,30 @@
 # tasks file for roles/rust
 
 - block:
-  - name: Check if rust is installed
+    - name: Check if rust is installed
+      shell: |
+        which rustc
+      register: rust_installed
+      ignore_errors: true
+
+    - name: Install rust using rustup
+      shell: |
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+      register: result
+      when: rust_installed.rc != 0
+
+    - name: Result
+      debug:
+        var: result
+
+  tags: ["install_rust"]
+
+- block:
+    - name: Install StyLua for lua formatter
+      shell: |
+        cargo install stylua
+      register: result
+
+    - name: Result
+      debug:
+        var: result
