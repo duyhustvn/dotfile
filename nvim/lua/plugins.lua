@@ -109,6 +109,14 @@ require("lazy").setup({
 					rust = { "rustfmt" },
 					-- Dart
 					dart = { "dart_format" },
+					-- You can use a function here to determine the formatters dynamically
+					python = function(bufnr)
+						if require("conform").get_formatter_info("ruff_format", bufnr).available then
+							return { "ruff_format" }
+						else
+							return { "isort", "black" }
+						end
+					end,
 				},
 
 				-- This controls the Format on Save behavior

@@ -8,9 +8,6 @@
       - wl-clipboard
       # Java
       - openjdk-21-jdk
-      # Python
-      - python3-debugpy
-      - python3-pip
       # Build tools
       - build-essential
       - cmake

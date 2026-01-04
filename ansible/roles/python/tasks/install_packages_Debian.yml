@@ -1,0 +1,8 @@
+- name: Install packages
+  become: true
+  apt:
+    name:
+      - python3-debugpy
+      - python3-pip
+    state: present
+    update_cache: yes

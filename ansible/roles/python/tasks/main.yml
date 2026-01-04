@@ -5,4 +5,7 @@
 
 - name: Install packages
   include_tasks: install_packages_{{ansible_os_family}}.yml
-  tags: [setup_computer]
+
+- include_tasks: install_uv.yml
+
+- include_tasks: install_ruff.yml

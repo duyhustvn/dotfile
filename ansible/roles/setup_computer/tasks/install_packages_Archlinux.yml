@@ -6,16 +6,14 @@
       - wl-clipboard
       # Java
       - jdk21-openjdk
-      # Python
-      - python-pip
       # Build tools
       - base-devel
-      - cmake 
+      - cmake
       # Development tools
-      - git 
+      - git
       - htop
-      - wget 
-      - curl 
+      - wget
+      - curl
       - ripgrep
       - libtool
       - unzip
@@ -23,7 +21,7 @@
       # Programming language
       - nodejs
       - npm
-      
+
       - clang
     state: present
     update_cache: yes

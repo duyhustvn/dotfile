@@ -1,0 +1,8 @@
+- name: Install uv python package management
+  shell: |
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+  register: result
+
+- name: Result
+  debug:
+    var: result

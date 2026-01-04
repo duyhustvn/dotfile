@@ -1,0 +1,9 @@
+- name: Install ruff python linter and code formatter
+  become: false
+  shell: |
+    curl -LsSf https://astral.sh/ruff/install.sh | sh
+  register: result
+
+- name: Result
+  debug:
+    var: result

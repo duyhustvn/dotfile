@@ -26,7 +26,8 @@
       when: (proxy | default('')) | trim == ""
 
   roles:
-    - setup_computer
-    - docker
-    - golang
-    - rust
+    # - setup_computer
+    # - docker
+    # - golang
+    # - rust
+    - python
