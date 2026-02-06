@@ -12,8 +12,9 @@
       get_url:
         url: "{{ go_url }}"
         dest: "/tmp/{{ go_archive }}"
-        mode: '0644'
-        
+        mode: "0644"
+      environment: "{{ (proxy | default('') | trim) | ternary({'http_proxy': proxy, 'https_proxy': proxy}, {}) }}"
+
     - name: Remove existing Go installation (if any)
       file:
         path: "{{ go_install_dir }}/go"
@@ -28,7 +29,7 @@
     - name: Ensure /usr/local/go/bin is in the PATH (user shell config)
       lineinfile:
         path: "{{ shell_config_path }}"
-        line: 'export PATH=$PATH:/usr/local/go/bin'
+        line: "export PATH=$PATH:/usr/local/go/bin"
         create: yes
         backup: yes
       become: false
@@ -36,7 +37,7 @@
     - name: Ensure $HOME/go/bin is in the PATH (user shell config)
       lineinfile:
         path: "{{ shell_config_path }}"
-        line: 'export PATH=$PATH:$HOME/go/bin'
+        line: "export PATH=$PATH:$HOME/go/bin"
         create: yes
         backup: yes
       become: false
@@ -44,9 +45,9 @@
     - name: Also create system-wide profile for compatibility
       lineinfile:
         path: /etc/profile.d/go.sh
-        line: 'export PATH=$PATH:/usr/local/go/bin'
+        line: "export PATH=$PATH:/usr/local/go/bin"
         create: yes
-        mode: '0755'
+        mode: "0755"
 
     - name: Verify Go installation (direct path)
       shell: "/usr/local/go/bin/go version"
@@ -71,29 +72,29 @@
 
   when: not go_stat.stat.exists
 
-- block: 
-  - name: Install go packages
-    shell: |
-      /usr/local/go/bin/go install golang.org/x/tools/gopls@latest
+- block:
+    - name: Install go packages
+      shell: |
+        /usr/local/go/bin/go install golang.org/x/tools/gopls@latest
 
-      /usr/local/go/bin/go install github.com/x-motemen/gore/cmd/gore@latest
+        /usr/local/go/bin/go install github.com/x-motemen/gore/cmd/gore@latest
 
-      /usr/local/go/bin/go install github.com/stamblerre/gocode@latest
+        /usr/local/go/bin/go install github.com/stamblerre/gocode@latest
 
-      /usr/local/go/bin/go install golang.org/x/tools/cmd/godoc@latest
+        /usr/local/go/bin/go install golang.org/x/tools/cmd/godoc@latest
 
-      /usr/local/go/bin/go install golang.org/x/tools/cmd/goimports@latest
+        /usr/local/go/bin/go install golang.org/x/tools/cmd/goimports@latest
 
-      /usr/local/go/bin/go install golang.org/x/tools/cmd/gorename@latest
+        /usr/local/go/bin/go install golang.org/x/tools/cmd/gorename@latest
 
-      /usr/local/go/bin/go install golang.org/x/tools/cmd/guru@latest
+        /usr/local/go/bin/go install golang.org/x/tools/cmd/guru@latest
 
-      /usr/local/go/bin/go install github.com/cweill/gotests/gotests@latest
+        /usr/local/go/bin/go install github.com/cweill/gotests/gotests@latest
 
-      /usr/local/go/bin/go install github.com/fatih/gomodifytags@latest
+        /usr/local/go/bin/go install github.com/fatih/gomodifytags@latest
 
-      /usr/local/go/bin/go install github.com/go-delve/delve/cmd/dlv@latest
+        /usr/local/go/bin/go install github.com/go-delve/delve/cmd/dlv@latest
 
-      /usr/local/go/bin/go install go.uber.org/mock/mockgen@latest
-    become: false
-  tags: [ install_go_packages ]
+        /usr/local/go/bin/go install go.uber.org/mock/mockgen@latest
+      become: false
+  tags: [install_go_packages]
