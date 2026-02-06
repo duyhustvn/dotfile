@@ -4,5 +4,6 @@
     name:
       - python3-debugpy
       - python3-pip
+      - pipx
     state: present
     update_cache: yes

@@ -1,6 +1,7 @@
 - name: Install uv python package management
+  become: false
   shell: |
-    curl -LsSf https://astral.sh/uv/install.sh | sh
+    pipx install uv
   register: result
 
 - name: Result
