@@ -1,0 +1,17 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/neovim
+
+- name: Download and extract Neovim
+  ansible.builtin.unarchive:
+    src: https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+    dest: /opt
+    remote_src: yes
+    creates: /opt/nvim-linux-x86_64 # Skips download if this directory already exists
+  environment: "{{ (proxy | default('') | trim) | ternary({'http_proxy': proxy, 'https_proxy': proxy}, {}) }}"
+
+- name: Ensure the binary is in the system PATH
+  ansible.builtin.file:
+    src: /opt/nvim-linux-x86_64/bin/nvim
+    dest: /usr/local/bin/vim
+    state: link
