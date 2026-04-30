@@ -7,18 +7,18 @@
       shell: |
         which rustc
       register: rust_installed
-      ignore_errors: true
+      changed_when: false
+      failed_when: false
 
     - name: Install rust using rustup
       shell: |
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       register: result
       when: rust_installed.rc != 0
 
     - name: Result
       debug:
         var: result
-
   tags: ["install_rust"]
 
 - block:
