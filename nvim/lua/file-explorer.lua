@@ -35,26 +35,26 @@ require("nvim-tree").setup({
                 git = true,
             },
             glyphs = {
-                default = "",
-                symlink = "",
-                bookmark = "",
+                default = "📄",
+                symlink = "🔗",
+                bookmark = "🔖",
                 folder = {
-                    arrow_closed = "",  -- Alternative: "▶"
-                    arrow_open = "",    -- Alternative: "▼"
-                    default = "📁",      -- Simple folder icon
-                    open = "📂",         -- Simple open folder icon
-                    empty = "📁",        -- Simple empty folder icon
-                    empty_open = "📂",   -- Simple empty open folder icon
-                    symlink = "📁",      -- Simple symlink folder icon
-                    symlink_open = "📂", -- Simple symlink open folder icon
+                    arrow_closed = "▶",
+                    arrow_open = "▼",
+                    default = "📁",
+                    open = "📂",
+                    empty = "📁",
+                    empty_open = "📂",
+                    symlink = "📁",
+                    symlink_open = "📂",
                 },
                 git = {
                     unstaged = "✗",
                     staged = "✓",
-                    unmerged = "",
+                    unmerged = "",
                     renamed = "➜",
                     untracked = "★",
-                    deleted = "",
+                    deleted = "🗑",
                     ignored = "◌",
                 },
             },
