@@ -1,8 +1,14 @@
 ---
-# tasks file for setup_computer
+# tasks file for bootstrap
 
 # Set shell configuration path globally for all tasks
 
 - name: Install packages
   include_tasks: install_packages_{{ansible_os_family}}.yml
-  tags: [setup_computer]
+  tags: [bootstrap]
+
+- name: Configure fzf
+  include_tasks: configure_fzf.yml
+  tags: [bootstrap, fzf]
+
+

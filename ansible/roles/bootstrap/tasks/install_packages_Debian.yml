@@ -2,12 +2,14 @@
   become: true
   apt:
     name:
+      # UI
+      - fonts-powerline
       # Clipboard
       - wl-clipboard
       # Java
-      - jdk21-openjdk
+      - openjdk-21-jdk
       # Build tools
-      - base-devel
+      - build-essential
       - cmake
       # Development tools
       - git
@@ -15,13 +17,12 @@
       - wget
       - curl
       - ripgrep
-      - libtool
+      - libtool-bin
       - unzip
+      - fzf
 
-      # Programming language
-      - nodejs
-      - npm
+      # Formatter
+      - clang-format
 
-      - clang
     state: present
     update_cache: yes

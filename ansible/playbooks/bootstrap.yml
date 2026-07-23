@@ -1,5 +1,5 @@
 ---
-- name: Setup Computer
+- name: Bootstrap Workstation
   hosts: localhost
   become: true
   gather_facts: true
@@ -26,9 +26,10 @@
       when: (proxy | default('')) | trim == ""
 
   roles:
-    - setup_computer
+    - bootstrap
     - docker
     - golang
     - rust
     - python
     - neovim
+

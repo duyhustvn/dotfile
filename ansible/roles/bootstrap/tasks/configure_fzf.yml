@@ -1,0 +1,25 @@
+---
+- name: Configure fzf and history options for zsh
+  ansible.builtin.blockinfile:
+    path: "{{ shell_config_path }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: fzf"
+    create: yes
+    block: |
+      source <(fzf --zsh)
+      export FZF_CTRL_R_OPTS="--height 40% --layout=reverse --border" # Tùy chỉnh giao diện: cao 40%, tìm kiếm từ trên xuống, có khung viền
+      setopt HIST_IGNORE_DUPS # Bỏ qua các lệnh trùng lặp ngay trước đó.
+      setopt HIST_IGNORE_ALL_DUPS # Xóa bỏ hoàn toàn các lệnh trùng lặp cũ hơn trong lịch sử.
+      setopt HIST_REDUCE_BLANKS # Xóa các khoảng trắng thừa khi lưu lệnh.
+  when: "'/zsh' in user_shell.stdout"
+  become: false
+
+- name: Configure fzf options for bash
+  ansible.builtin.blockinfile:
+    path: "{{ shell_config_path }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: fzf"
+    create: yes
+    block: |
+      source <(fzf --bash)
+      export FZF_CTRL_R_OPTS="--height 40% --layout=reverse --border" # Tùy chỉnh giao diện: cao 40%, tìm kiếm từ trên xuống, có khung viền
+  when: "'/zsh' not in user_shell.stdout"
+  become: false
