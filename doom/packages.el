@@ -49,17 +49,12 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 
-(package! all-the-icons-dired)
-(package! treemacs-projectile)
 (package! dap-mode)
-(package! undo-tree)
 (package! diminish)
 (package! dimmer)
-(package! paren)
 (package! engine-mode)
 (package! exwm)
 (package! org-bullets)
 (package! visual-fill-column)
 (package! desktop-environment)
-(package! counsel)
-(package! treemacs-all-the-icons)
+

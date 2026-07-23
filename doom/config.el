@@ -70,11 +70,12 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-(global-set-key (kbd "s-h") 'dap-hydra)
-(global-set-key (kbd "s-o") 'treemacs-narrow-to-current-file)
-(global-set-key (kbd "s-c") 'treemacs-add-and-display-current-project-exclusively)
-(global-set-key (kbd "s-s") 'lsp-treemacs-symbols)
-(global-set-key (kbd "s-b") 'switch-to-buffer)
+(map! :map global-map
+      "s-h" #'dap-hydra
+      "s-o" #'treemacs-narrow-to-current-file
+      "s-c" #'treemacs-add-and-display-current-project-exclusively
+      "s-s" #'lsp-treemacs-symbols
+      "s-b" #'switch-to-buffer)
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
@@ -107,11 +108,6 @@
 (setq display-line-numbers-type t)
 
 ;; VISUAL
-(use-package! all-the-icons)
-(use-package! all-the-icons-dired
-  :after all-the-icons
-  :hook (dired-mode . all-the-icons-dired-mode)
-)
 
 (use-package! diminish
   :config
@@ -179,41 +175,16 @@
 (use-package magit-todos
   :defer t)
 
-(use-package! treemacs
-  ;; :hook (treemacs . 'treemacs-display-current-project-exclusively)
-  :config
-  ;; M-x treemacs-load-theme to set theme for treemacs
+(after! treemacs
   (setq doom-themes-treemacs-theme 'Idea
         treemacs-tag-follow-delay 1)
   (treemacs-follow-mode t)
-  ;; (treemacs-tag-follow-mode t)
-  (treemacs-fringe-indicator-mode 'always)
+  (treemacs-fringe-indicator-mode 'always))
 
-)
-
-;; (defun display-current-project()
-;;     (message "treemacs-mode-hook `%s'" (current-buffer))
-;;     (treemacs-add-and-display-current-project-exclusively)
-;; )
-;;
-;; (add-hook 'treemacs-mode-hook #'display-current-project)
-
-
-(use-package! treemacs-projectile
-  :after (treemacs projectile)
-)
-
-(use-package! treemacs-magit
-  :after (treemacs magit)
-)
-
-(use-package! pdf-tools
-  :mode ("\\.pdf\\'" . pdf-view-mode)
-  :config
+(after! pdf-tools
   (setq pdf-view-display-size 'fit-page)
   (setq pdf-view-resize-factor 1.1)
-  (setq pdf-continuous-scroll-mode t)
-)
+  (setq pdf-continuous-scroll-mode t))
 
 ;; Run nerd-icons-install-fonts to install fonts for modeline
 (after! doom-modeline
@@ -226,8 +197,8 @@
   (display-time-mode 1)
 )
 
- (after! vterm
-   (setq vterm-shell "/bin/zsh"))
+(after! vterm
+  (setq vterm-shell "/bin/zsh"))
 
 (with-eval-after-load 'lsp-mode
   (add-to-list 'lsp-file-watch-ignored-directories "[/\\\\]\\env3\\'")
@@ -236,7 +207,9 @@
 )
 
 (after! lsp-clangd
-  (setq lsp-clangd-binary-path "~/.config/emacs/.local/etc/lsp/clangd/clangd_20.1.0/bin/clangd"))
+  (when-let ((clangd-binary (or (executable-find "clangd")
+                                (car (file-expand-wildcards "~/.config/emacs/.local/etc/lsp/clangd/clangd_*/bin/clangd")))))
+    (setq lsp-clangd-binary-path clangd-binary)))
 
 (use-package! dap-mode
   ;; :init
@@ -349,6 +322,15 @@
        :miDebuggerPath (format "%s/gdb_root.sh" (lsp-workspace-root))
        ))
 
+#!/bin/bash
+SELF_PATH=$(realpath -s "$0")
+
+if [[ "$SUDO_ASKPASS" = "$SELF_PATH" ]]; then
+    zenity --password --title="$1"
+else
+    exec env SUDO_ASKPASS="$SELF_PATH" sudo -A /usr/bin/gdb $@
+fi
+
 (after! go-mode
   (setq gofmt-command "goimports")
   (add-hook 'before-save-hook 'gofmt-before-save))
@@ -384,14 +366,13 @@
 (defun efs/org-mode-setup ()
   (org-indent-mode)
   ;; (variable-pitch-mode 1)
-  (visual-line-mode 1) ;; wrap line
-)
+  (visual-line-mode 1))
 
-(use-package! org
+(after! org
   :hook (org-mode . efs/org-mode-setup)
-  :config
   (setq org-ellipsis " ▾"
-        org-hide-emphasis-markers t)
+        org-hide-emphasis-markers t
+        org-startup-with-inline-images t)
 
   (setq org-agenda-start-with-log-mode t)
   (setq org-log-done 'time)
@@ -480,27 +461,10 @@
         visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
-; (use-package! visual-fill-column
-;   :hook (org-mode . efs/org-mode-visual-fill))
-
-(use-package! org
-  :config
-  (setq org-startup-with-inline-images t)
-)
-
 (org-babel-do-load-languages
   'org-babel-load-languages
   '((emacs-lisp . t)
     (python . t)))
-
-(defun efs/org-babel-tangle-config ()
-  (when (string-equal (file-name-directory (buffer-file-name))
-                      (expand-file-name "~/.config/doom/"))
-    ;; Dynamic scoping to the rescue
-    (let ((org-confirm-babel-evaluate nil))
-      (org-babel-tangle))))
-
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
 
 (defun arrayify (start end quote)
   "Turn strings on newlines into a QUOTEd, comma-separated one-liner."
