@@ -399,7 +399,7 @@ Reference: https://github.com/emacs-lsp/lsp-mode/blob/master/docs/tutorials/CPP-
 #+end_src
 
 **** File gdb_root.sh
-#+begin_src shell
+#+begin_src shell :tangle no
 
 #!/bin/bash
 SELF_PATH=$(realpath -s "$0")
@@ -473,8 +473,9 @@ fi
   ;; (variable-pitch-mode 1)
   (visual-line-mode 1))
 
+(add-hook 'org-mode-hook #'efs/org-mode-setup)
+
 (after! org
-  :hook (org-mode . efs/org-mode-setup)
   (setq org-ellipsis " ▾"
         org-hide-emphasis-markers t
         org-startup-with-inline-images t)

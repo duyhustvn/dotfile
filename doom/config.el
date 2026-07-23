@@ -322,15 +322,6 @@
        :miDebuggerPath (format "%s/gdb_root.sh" (lsp-workspace-root))
        ))
 
-#!/bin/bash
-SELF_PATH=$(realpath -s "$0")
-
-if [[ "$SUDO_ASKPASS" = "$SELF_PATH" ]]; then
-    zenity --password --title="$1"
-else
-    exec env SUDO_ASKPASS="$SELF_PATH" sudo -A /usr/bin/gdb $@
-fi
-
 (after! go-mode
   (setq gofmt-command "goimports")
   (add-hook 'before-save-hook 'gofmt-before-save))
@@ -368,8 +359,9 @@ fi
   ;; (variable-pitch-mode 1)
   (visual-line-mode 1))
 
+(add-hook 'org-mode-hook #'efs/org-mode-setup)
+
 (after! org
-  :hook (org-mode . efs/org-mode-setup)
   (setq org-ellipsis " ▾"
         org-hide-emphasis-markers t
         org-startup-with-inline-images t)
