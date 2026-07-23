@@ -1,66 +1,68 @@
-* Setup requirements packages
-#+begin_src shell
+# Dotfiles Setup
+
+## Setup Requirements Packages
+```bash
 cd ansible
 ansible-playbook playbooks/bootstrap.yml --ask-become-pass
-#+end_src
+```
 
-* Install Nerd Fonts (Required for Icons in Neovim & Doom Emacs)
+## Install Nerd Fonts (Required for Icons in Neovim & Doom Emacs)
 File icons require a patched **Nerd Font** (e.g., JetBrainsMono Nerd Font).
 
-** Linux (Ubuntu/Debian/Arch)
-#+begin_src shell :tangle no
+### Linux (Ubuntu/Debian/Arch)
+```bash
 mkdir -p ~/.local/share/fonts
 wget https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip -O /tmp/JetBrainsMono.zip
 unzip -o /tmp/JetBrainsMono.zip -d ~/.local/share/fonts/
 fc-cache -fv
 rm /tmp/JetBrainsMono.zip
-#+end_src
+```
 
-** macOS
-#+begin_src shell :tangle no
+### macOS
+```bash
 brew install --cask font-jetbrains-mono-nerd-font
-#+end_src
+```
 
-** Terminal Configuration
-After installing the font, set your terminal font to **JetBrainsMono Nerd Font** (or ~JetBrainsMonoNF~).
+### Terminal Configuration
+After installing the font, set your terminal font to **JetBrainsMono Nerd Font** (or `JetBrainsMonoNF`).
 
-*** GNOME Terminal (Command Line)
-#+begin_src shell :tangle no
+#### GNOME Terminal (Command Line)
+```bash
 PROFILE=$(gsettings get org.gnome.Terminal.ProfilesList default | tr -d "'")
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ use-system-font false
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ font 'JetBrainsMono Nerd Font 12'
-#+end_src
+```
 
-*** Kitty (~/.config/kitty/kitty.conf~)
-#+begin_src conf :tangle no
+#### Kitty (`~/.config/kitty/kitty.conf`)
+```conf
 font_family JetBrainsMono Nerd Font
-#+end_src
+```
 
-*** Alacritty (~/.config/alacritty/alacritty.toml~)
-#+begin_src toml :tangle no
+#### Alacritty (`~/.config/alacritty/alacritty.toml`)
+```toml
 [font.normal]
 family = "JetBrainsMono Nerd Font"
-#+end_src
+```
 
-*** WezTerm (~/.config/wezterm/wezterm.lua~)
-#+begin_src lua :tangle no
+#### WezTerm (`~/.config/wezterm/wezterm.lua`)
+```lua
 config.font = wezterm.font("JetBrainsMono Nerd Font")
-#+end_src
+```
 
-* Setup neovim
-- Copying config for neovim by creating symbol
-#+begin_src shell
+## Setup Neovim
+Copying config for Neovim by creating symlink:
+```bash
 ln -s $(pwd)/nvim ~/.config/nvim
-#+end_src
+```
 
-* Setup doom
-- Copying config for doom by creating symbol
-#+begin_src shell
+## Setup Doom Emacs
+Copying config for Doom Emacs by creating symlink:
+```bash
 ln -s $(pwd)/doom ~/.config/doom
-#+end_src
+```
 
-* Setup tmux
-- Copying config for tmux by creating symbol
-#+begin_src shell
+## Setup Tmux
+Copying config for Tmux by creating symlink:
+```bash
 ln -s $(pwd)/tmux/tmux.conf ~/.tmux.conf
-#+end_src
+```
