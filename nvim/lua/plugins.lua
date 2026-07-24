@@ -138,4 +138,15 @@ require("lazy").setup({
 		---@type render.md.UserConfig
 		opts = {},
 	},
+
+	-- Debug Adapter Protocol (DAP)
+	{
+		"mfussenegger/nvim-dap",
+		dependencies = {
+			"rcarriga/nvim-dap-ui",
+			"nvim-neotest/nvim-nio",
+			"theHamsta/nvim-dap-virtual-text",
+			"jay-babu/mason-nvim-dap.nvim",
+		},
+	},
 })
