@@ -31,17 +31,17 @@ Cấu hình sử dụng bộ plugin:
 ## 3. Cách sử dụng với file `.vscode/launch.json`
 
 1. Tạo file `.vscode/launch.json` trong dự án của bạn (tương tự như trong VS Code).
-   *Ví dụ cấu hình cho Python (`.vscode/launch.json`):*
+   *Ví dụ cấu hình cho Go (`.vscode/launch.json`):*
    ```json
    {
      "version": "0.2.0",
      "configurations": [
        {
-         "name": "Python: Current File",
-         "type": "python",
+         "name": "Launch Package",
+         "type": "go",
          "request": "launch",
-         "program": "${file}",
-         "console": "integratedTerminal"
+         "mode": "auto",
+         "program": "${fileDirname}"
        }
      ]
    }
@@ -51,25 +51,17 @@ Cấu hình sử dụng bộ plugin:
 3. Di chuyển đến dòng mong muốn và nhấn **`<leader>b>`** để đặt Breakpoint.
 4. Nhấn **`<F5>`**:
    - Neovim sẽ tự động load file `.vscode/launch.json`.
-   - Nếu debugger adapter (như `python`, `delve`, `codelldb`) chưa có, Mason sẽ tự động tải về.
+   - Nếu debugger adapter (như `delve` cho Go, `codelldb` cho C/C++/Rust, `python` cho Python) chưa có, Mason sẽ tự động tải về.
    - Giao diện Debug UI sẽ tự bật lên và bắt đầu phiên debug.
 
 ---
 
-## 4. Tùy chỉnh thêm các ngôn ngữ khác
+## 4. Xử lý lỗi lệch tên Adapter (VD: `go` vs `delve`)
 
-File cấu hình chính nằm tại: [lua/dap-config.lua](lua/dap-config.lua).
+Trong VS Code, file `launch.json` dùng `"type": "go"`, nhưng trong Mason plugin tên adapter là `"delve"`.
 
-Nếu bạn cần thêm mapping loại debugger cho các ngôn ngữ khác trong `.vscode/launch.json`, hãy cập nhật bảng ánh xạ trong `lua/dap-config.lua`:
+Cấu hình trong `lua/dap-config.lua` đã được thêm bộ ánh xạ tự động (alias):
+- `dap.adapters.go` $\rightarrow$ `dap.adapters.delve`
+- `dap.adapters.cppdbg` $\rightarrow$ `dap.adapters.codelldb`
 
-```lua
-require("dap.ext.vscode").load_launchjs(nil, {
-    ["pwa-node"] = { "javascript", "typescript" },
-    ["node"]     = { "javascript", "typescript" },
-    ["cppdbg"]   = { "c", "cpp" },
-    ["codelldb"] = { "c", "cpp", "rust" },
-    ["go"]       = { "go" },
-    ["delve"]    = { "go" },
-    ["python"]   = { "python" },
-})
-```
+Do đó bạn có thể giữ nguyên file `.vscode/launch.json` chuẩn VS Code mà không cần sửa `"type": "go"` thành `"delve"`.

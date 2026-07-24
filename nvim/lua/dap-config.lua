@@ -4,12 +4,32 @@ local dapui = require("dapui")
 -- Tự động tải Debug Adapter bằng Mason
 require("mason-nvim-dap").setup({
 	automatic_installation = true,
-	handlers = {},
+	handlers = {
+		function(config)
+			require("mason-nvim-dap").default_setup(config)
+		end,
+		delve = function(config)
+			require("mason-nvim-dap").default_setup(config)
+			dap.adapters.go = dap.adapters.delve
+		end,
+	},
 	ensure_installed = {
 		"delve", -- Go
 		"codelldb", -- C/C++/Rust
 		"python", -- Python
 	},
+})
+
+-- Tạo alias cho adapter nếu tên trong launch.json (ví dụ: "go") khác tên adapter của Mason ("delve")
+setmetatable(dap.adapters, {
+	__index = function(t, k)
+		if k == "go" then
+			return t.delve
+		elseif k == "cppdbg" then
+			return t.codelldb
+		end
+		return nil
+	end,
 })
 
 -- Tự động mở/đóng giao diện Debug UI
@@ -41,6 +61,11 @@ local function load_vscode_launch()
 			["delve"] = { "go" },
 			["python"] = { "python" },
 		})
+	end
+
+	-- Đảm bảo alias adapter 'go' -> 'delve' luôn tồn tại sau khi load
+	if dap.adapters.delve and not dap.adapters.go then
+		dap.adapters.go = dap.adapters.delve
 	end
 end
 
