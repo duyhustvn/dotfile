@@ -58,12 +58,17 @@ fc-cache -fv
 ### Terminal Setup
 Set your Terminal font to **JetBrainsMono Nerd Font**.
 
-- **GNOME Terminal (Command Line):**
+- **GNOME Terminal (Native Ubuntu Desktop CLI):**
   ```bash
   PROFILE=$(gsettings get org.gnome.Terminal.ProfilesList default | tr -d "'")
   gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ use-system-font false
   gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ font 'JetBrainsMono Nerd Font 12'
   ```
+
+- **Windows Terminal (WSL):**
+  1. Tải & Cài đặt **JetBrainsMono Nerd Font** trên Windows Host.
+  2. Mở **Windows Terminal** ➔ Bấm `Ctrl + ,` (Settings).
+  3. Chọn **Ubuntu** (hoặc **Defaults**) ➔ **Appearance** ➔ Mục **Font face** chọn `JetBrainsMono Nerd Font`.
 - **Kitty (`~/.config/kitty/kitty.conf`):** `font_family JetBrainsMono Nerd Font`
 - **Alacritty (`~/.config/alacritty/alacritty.toml`):** `family = "JetBrainsMono Nerd Font"`
 

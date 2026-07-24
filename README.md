@@ -26,12 +26,17 @@ brew install --cask font-jetbrains-mono-nerd-font
 ### Terminal Configuration
 After installing the font, set your terminal font to **JetBrainsMono Nerd Font** (or `JetBrainsMonoNF`).
 
-#### GNOME Terminal (Command Line)
+#### GNOME Terminal (Native Ubuntu Desktop CLI)
 ```bash
 PROFILE=$(gsettings get org.gnome.Terminal.ProfilesList default | tr -d "'")
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ use-system-font false
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ font 'JetBrainsMono Nerd Font 12'
 ```
+
+#### Windows Terminal (WSL)
+1. Download & Install **JetBrainsMono Nerd Font** on Windows Host.
+2. Open **Windows Terminal** ➔ Press `Ctrl + ,` (Settings).
+3. Select **Ubuntu** (or **Defaults**) ➔ **Appearance** ➔ Set **Font face** to `JetBrainsMono Nerd Font`.
 
 #### Kitty (`~/.config/kitty/kitty.conf`)
 ```conf
