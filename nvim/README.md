@@ -65,10 +65,19 @@ Set your Terminal font to **JetBrainsMono Nerd Font**.
   gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ font 'JetBrainsMono Nerd Font 12'
   ```
 
-- **Windows Terminal (WSL):**
-  1. Tải & Cài đặt **JetBrainsMono Nerd Font** trên Windows Host.
-  2. Mở **Windows Terminal** ➔ Bấm `Ctrl + ,` (Settings).
-  3. Chọn **Ubuntu** (hoặc **Defaults**) ➔ **Appearance** ➔ Mục **Font face** chọn `JetBrainsMono Nerd Font`.
+- **Windows Terminal (Hướng dẫn cài đặt chi tiết cho WSL):**
+  Vì WSL chạy bên trong Windows Terminal, font phải được cài đặt trên máy **Windows Host**:
+  1. **Tải & Cài đặt Font trên Windows Host:**
+     - Tải gói [JetBrainsMono.zip](https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip).
+     - Giải nén file `.zip`.
+     - Chọn tất cả các file font `.ttf`, click chuột phải chọn **Install for all users** (Cài đặt cho tất cả người dùng).
+  2. **Cấu hình Windows Terminal:**
+     - Mở ứng dụng **Windows Terminal**.
+     - Bấm tổ hợp phím `Ctrl + ,` (hoặc chọn ⚙ **Settings**).
+     - Menu bên trái ➔ Chọn **Ubuntu** (hoặc **Defaults**) trong mục *Profiles*.
+     - Bấm chọn **Appearance** (Diện mạo).
+     - Mục **Font face** ➔ Chọn **JetBrainsMono Nerd Font** (hoặc `JetBrainsMonoNF`).
+     - Bấm **Save** (Lưu) ở góc dưới bên phải.
 - **Kitty (`~/.config/kitty/kitty.conf`):** `font_family JetBrainsMono Nerd Font`
 - **Alacritty (`~/.config/alacritty/alacritty.toml`):** `family = "JetBrainsMono Nerd Font"`
 

@@ -33,10 +33,21 @@ gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profi
 gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ font 'JetBrainsMono Nerd Font 12'
 ```
 
-#### Windows Terminal (WSL)
-1. Download & Install **JetBrainsMono Nerd Font** on Windows Host.
-2. Open **Windows Terminal** ➔ Press `Ctrl + ,` (Settings).
-3. Select **Ubuntu** (or **Defaults**) ➔ **Appearance** ➔ Set **Font face** to `JetBrainsMono Nerd Font`.
+#### Windows Terminal (WSL Setup Guide)
+Because WSL runs inside Windows Terminal, fonts must be installed on the **Windows Host** system:
+
+1. **Download Font on Windows:**
+   - Download [JetBrainsMono.zip](https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip).
+   - Extract the `.zip` file.
+   - Select all `.ttf` font files, right-click, and select **Install for all users** (or **Install**).
+
+2. **Configure Windows Terminal:**
+   - Open **Windows Terminal**.
+   - Press `Ctrl + ,` (or click ⚙ **Settings**).
+   - In the left sidebar, under **Profiles**, select **Ubuntu** (or **Defaults** to apply to all profiles).
+   - Click **Appearance**.
+   - Set **Font face** to `JetBrainsMono Nerd Font` (or `JetBrainsMonoNF`).
+   - Click **Save** in the bottom right corner.
 
 #### Kitty (`~/.config/kitty/kitty.conf`)
 ```conf
