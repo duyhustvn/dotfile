@@ -58,5 +58,7 @@
 (package! visual-fill-column)
 (package! desktop-environment)
 (package! openwith)
+(package! rainbow-delimiters)
+
 
 
