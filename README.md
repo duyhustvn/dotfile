@@ -7,9 +7,14 @@ If Ansible is not installed on your system yet, install it using `pipx` (recomme
 ```bash
 sudo apt update && sudo apt install -y pipx
 pipx ensurepath
-pipx install ansible
+source ~/.zshrc # or source ~/.bashrc
+
+# Install ansible-core (provides ansible-playbook, ansible-galaxy, etc.)
+pipx install ansible-core
+# Or install full ansible package with all dependencies exposed:
+# pipx install ansible --include-deps
 ```
-> **Note**: Restart your terminal or run `source ~/.zshrc` (or `source ~/.bashrc`) after `pipx ensurepath`.
+> **Note**: Make sure `~/.local/bin` is in your `$PATH` (handled by `pipx ensurepath` after restarting terminal or sourcing your shell config).
 
 ### Option 2: Install via `apt` (Ubuntu/Debian)
 ```bash
