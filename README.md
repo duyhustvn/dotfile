@@ -1,5 +1,21 @@
 # Dotfiles Setup
 
+## Prerequisites: Install Ansible
+If Ansible is not installed on your system yet, install it using `pipx` (recommended) or `apt`:
+
+### Option 1: Install via `pipx` (Recommended)
+```bash
+sudo apt update && sudo apt install -y pipx
+pipx ensurepath
+pipx install ansible
+```
+> **Note**: Restart your terminal or run `source ~/.zshrc` (or `source ~/.bashrc`) after `pipx ensurepath`.
+
+### Option 2: Install via `apt` (Ubuntu/Debian)
+```bash
+sudo apt update && sudo apt install -y ansible
+```
+
 ## Setup Requirements Packages
 ```bash
 cd ansible

@@ -133,7 +133,8 @@ install_deb() {
         echo "****************"
         echo "* INSTALL RUST *"
         echo "****************"
-        curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
+        curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh -s -- -y
+        [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
       fi
     }
 
@@ -196,7 +197,10 @@ install_deb() {
         echo "********************************"
         echo "* INSTALL RUST LANGUAGE SERVER *"
         echo "********************************"
-      rustup component add rust-analyzer
+        [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
+        if [ -x "$(command -v rustup)" ]; then
+          rustup component add rust-analyzer rust-src
+        fi
     }
 
     # TYPESCRIPT
