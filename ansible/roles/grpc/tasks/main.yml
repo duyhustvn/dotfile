@@ -1,0 +1,29 @@
+---
+# tasks file for roles/grpc
+
+- name: Install Protobuf compiler (protoc)
+  become: true
+  apt:
+    name:
+      - protobuf-compiler
+      - libprotobuf-dev
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Install Go gRPC plugins and CLI tools
+  shell: |
+    /usr/local/go/bin/go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+    /usr/local/go/bin/go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+    /usr/local/go/bin/go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+    /usr/local/go/bin/go install github.com/fullstorydev/grpcui/cmd/grpcui@latest
+  become: false
+  tags: [grpc_go]
+
+- name: Install Rust gRPC tools (protoc-gen-prost & protoc-gen-tonic)
+  shell: |
+    $HOME/.cargo/bin/cargo install protoc-gen-prost protoc-gen-tonic
+  become: false
+  async: 600
+  poll: 10
+  tags: [grpc_rust]
