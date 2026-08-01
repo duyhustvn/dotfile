@@ -19,11 +19,13 @@
       debug:
         msg: "Proxy is SET to '{{ proxy }}'"
       when: (proxy | default('')) | trim != ""
+      tags: [debug]
 
     - name: Debug
       debug:
         msg: "Proxy is not SET"
       when: (proxy | default('')) | trim == ""
+      tags: [debug]
 
   roles:
     - bootstrap

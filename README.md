@@ -24,7 +24,12 @@ sudo apt update && sudo apt install -y ansible
 ## Setup Requirements Packages
 ```bash
 cd ansible
-ansible-playbook playbooks/bootstrap.yml --ask-become-pass
+
+# Run for Home environment (No Proxy):
+ansible-playbook -i inventory/home/hosts.yml playbooks/bootstrap.yml --ask-become-pass
+
+# Run for Office environment (With Proxy configured in inventory/office/group_vars/all.yml):
+ansible-playbook -i inventory/office/hosts.yml playbooks/bootstrap.yml --ask-become-pass
 ```
 
 ## Install Nerd Fonts (Required for Icons in Neovim & Doom Emacs)

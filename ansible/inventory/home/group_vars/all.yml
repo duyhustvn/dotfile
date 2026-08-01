@@ -1,0 +1,4 @@
+---
+# Cau hinh cho moi truong o nha (Khong dung Proxy)
+proxy: ""
+no_proxy: "localhost,127.0.0.1"

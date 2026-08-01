@@ -1,0 +1,5 @@
+---
+# Cau hinh Proxy cho moi truong Cong ty / Office
+# Thay doi proxy phu hop voi moi truong cua bạn
+proxy: "http://10.0.0.1:8080"
+no_proxy: "localhost,127.0.0.1"
