@@ -537,3 +537,7 @@ The region is specified by START and END positions."
     (kill-new json-string) ;; Copy to clipboard
     (with-output-to-temp-buffer "*JSON String*"
       (princ json-string)))) ;; Output to a temporary buffer
+
+(after! markdown-mode
+  (setq markdown-command "pandoc")
+  (setq markdown-open-command "xdg-open"))

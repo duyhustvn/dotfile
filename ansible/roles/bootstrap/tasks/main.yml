@@ -1,14 +1,14 @@
 ---
 # tasks file for bootstrap
 
-# Set shell configuration path globally for all tasks
+- name: Install base system packages
+  include_tasks: system_packages.yml
+  tags: [bootstrap, system_packages]
 
-- name: Install packages
-  include_tasks: install_packages_{{ansible_os_family}}.yml
-  tags: [bootstrap]
+- name: Install Nerd Fonts
+  include_tasks: install_fonts.yml
+  tags: [bootstrap, fonts]
 
 - name: Configure fzf
   include_tasks: configure_fzf.yml
   tags: [bootstrap, fzf]
-
-

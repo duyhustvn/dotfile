@@ -1,0 +1,12 @@
+---
+# tasks file for java
+
+- name: Install Java OpenJDK
+  become: true
+  apt:
+    name:
+      - openjdk-21-jdk
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+  tags: [java]

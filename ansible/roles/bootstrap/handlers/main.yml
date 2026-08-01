@@ -1,2 +1,7 @@
 ---
 # handlers file for bootstrap
+
+- name: Refresh font cache
+  ansible.builtin.command: fc-cache -fv
+  become: false
+  changed_when: true

@@ -33,6 +33,7 @@
     - golang
     - rust
     - python
+    - java
     - neovim
     - lsp
 
