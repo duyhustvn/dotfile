@@ -3,7 +3,7 @@
 
 - name: Check if nvm is installed
   stat:
-    path: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+    path: "{{ ansible_facts['env']['HOME'] }}/.nvm/nvm.sh"
   register: nvm_stat
   become: false
 
