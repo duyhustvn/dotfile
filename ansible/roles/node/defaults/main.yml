@@ -1,5 +1,5 @@
 ---
 # defaults file for roles/node
 
-node_version: "--lts"
+node_version: "lts/*"
 nvm_version: "v0.40.6"
