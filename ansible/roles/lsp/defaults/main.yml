@@ -1,0 +1,9 @@
+---
+# defaults file for roles/lsp
+
+npm_lsp_packages:
+  - yaml-language-server
+  - bash-language-server
+  - dockerfile-language-server-nodejs
+  - vscode-langservers-extracted
+  - pyright

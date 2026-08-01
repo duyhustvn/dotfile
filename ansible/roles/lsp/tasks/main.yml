@@ -1,0 +1,12 @@
+---
+# tasks file for roles/lsp
+
+- name: Install NPM global LSP packages
+  ansible.builtin.npm:
+    name: "{{ item }}"
+    global: yes
+    state: present
+  loop: "{{ npm_lsp_packages }}"
+  environment: "{{ (proxy | default('') | trim) | ternary({'http_proxy': proxy, 'https_proxy': proxy}, {}) }}"
+  when: npm_lsp_packages is defined and npm_lsp_packages | length > 0
+

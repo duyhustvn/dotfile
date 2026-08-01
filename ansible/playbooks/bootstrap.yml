@@ -32,4 +32,6 @@
     - rust
     - python
     - neovim
+    - lsp
+
 
