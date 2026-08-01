@@ -1,7 +1,7 @@
 - name: Install ruff python linter and code formatter
   become: false
   shell: |
-    uv tool install ruff@latest
+    $HOME/.local/bin/uv tool install ruff@latest
   register: result
 
 - name: Result

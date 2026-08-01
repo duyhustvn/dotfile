@@ -5,7 +5,7 @@
 - block:
     - name: Check if rust is installed
       shell: |
-        which rustc
+        $HOME/.cargo/bin/rustc --version
       register: rust_installed
       changed_when: false
       failed_when: false
@@ -24,7 +24,7 @@
 - block:
     - name: Install StyLua for lua formatter
       shell: |
-        cargo install stylua
+        $HOME/.cargo/bin/cargo install stylua
       register: result
 
     - name: Result
