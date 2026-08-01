@@ -1,0 +1,57 @@
+---
+# tasks file for roles/node
+
+- name: Check if nvm is installed
+  stat:
+    path: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+  register: nvm_stat
+  become: false
+
+- name: Install NVM
+  shell: |
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
+  become: false
+  when: not nvm_stat.stat.exists
+  environment: "{{ (proxy | default('') | trim) | ternary({'http_proxy': proxy, 'https_proxy': proxy}, {}) }}"
+
+- name: Check if Node.js is installed via NVM
+  shell: |
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    node --version
+  register: node_check
+  become: false
+  failed_when: false
+  changed_when: false
+
+- name: Install Node.js using NVM
+  shell: |
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    nvm install {{ node_version }}
+    nvm alias default {{ node_version }}
+  become: false
+  when: node_check.rc != 0
+  environment: "{{ (proxy | default('') | trim) | ternary({'http_proxy': proxy, 'https_proxy': proxy}, {}) }}"
+
+- name: Find active Node.js binary directory from NVM
+  shell: |
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    dirname $(which node)
+  register: nvm_node_bin_dir
+  become: false
+  changed_when: false
+
+- name: Ensure Node.js binaries are symlinked to /usr/local/bin
+  file:
+    src: "{{ nvm_node_bin_dir.stdout }}/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    state: link
+    force: yes
+  loop:
+    - node
+    - npm
+    - npx
+  become: true
+  when: nvm_node_bin_dir.stdout is defined and nvm_node_bin_dir.stdout | length > 0
