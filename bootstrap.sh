@@ -103,5 +103,5 @@ fi
 
 echo "=================================================="
 echo " Done! Zsh, Oh My Zsh, and Ansible are set up."
-echo " To start using Zsh immediately, run: zsh"
+echo " To start using Zsh immediately, run: exec zsh"
 echo "=================================================="
