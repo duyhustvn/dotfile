@@ -3,44 +3,53 @@
 
 - name: Check if nvm is installed
   stat:
-    path: "{{ ansible_facts['env']['HOME'] }}/.nvm/nvm.sh"
+    path: "{{ real_user_home.stdout }}/.nvm/nvm.sh"
   register: nvm_stat
-  become: false
 
-- name: Install NVM
+- name: Install NVM for real user
   shell: |
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
-  become: false
+  become: true
+  become_user: "{{ real_user.stdout }}"
   when: not nvm_stat.stat.exists
-  environment: "{{ (proxy | default('') | trim) | ternary({'http_proxy': proxy, 'https_proxy': proxy}, {}) }}"
+  environment:
+    HOME: "{{ real_user_home.stdout }}"
 
 - name: Check if Node.js is installed via NVM
   shell: |
-    export NVM_DIR="$HOME/.nvm"
+    export NVM_DIR="{{ real_user_home.stdout }}/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
     node --version
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  environment:
+    HOME: "{{ real_user_home.stdout }}"
   register: node_check
-  become: false
   failed_when: false
   changed_when: false
 
 - name: Install Node.js using NVM
   shell: |
-    export NVM_DIR="$HOME/.nvm"
+    export NVM_DIR="{{ real_user_home.stdout }}/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
     nvm install {{ node_version }}
     nvm alias default {{ node_version }}
-  become: false
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  environment:
+    HOME: "{{ real_user_home.stdout }}"
   when: node_check.rc != 0
-  environment: "{{ (proxy | default('') | trim) | ternary({'http_proxy': proxy, 'https_proxy': proxy}, {}) }}"
 
 - name: Find active Node.js binary directory from NVM
   shell: |
-    export NVM_DIR="$HOME/.nvm"
+    export NVM_DIR="{{ real_user_home.stdout }}/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
     dirname $(which node)
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  environment:
+    HOME: "{{ real_user_home.stdout }}"
   register: nvm_node_bin_dir
-  become: false
   changed_when: false
 
 - name: Ensure Node.js binaries are symlinked to /usr/local/bin
@@ -65,5 +74,6 @@
       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
       [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
     create: yes
-  become: false
+  become: true
+  become_user: "{{ real_user.stdout }}"
   when: shell_config_path is defined

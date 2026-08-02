@@ -7,6 +7,10 @@
     global: yes
     state: present
   loop: "{{ npm_lsp_packages }}"
-  environment: "{{ (proxy | default('') | trim) | ternary({'http_proxy': proxy, 'https_proxy': proxy}, {}) }}"
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  environment:
+    HOME: "{{ real_user_home.stdout }}"
+    http_proxy: "{{ proxy | default('') }}"
+    https_proxy: "{{ proxy | default('') }}"
   when: npm_lsp_packages is defined and npm_lsp_packages | length > 0
-
