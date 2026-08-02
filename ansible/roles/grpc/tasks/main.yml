@@ -17,13 +17,24 @@
     /usr/local/go/bin/go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
     /usr/local/go/bin/go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
     /usr/local/go/bin/go install github.com/fullstorydev/grpcui/cmd/grpcui@latest
-  become: false
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  environment:
+    HOME: "{{ real_user_home.stdout }}"
+    GOPATH: "{{ real_user_home.stdout }}/go"
+    http_proxy: "{{ proxy | default('') }}"
+    https_proxy: "{{ proxy | default('') }}"
   tags: [grpc_go]
 
 - name: Install Rust gRPC tools (protoc-gen-prost & protoc-gen-tonic)
   shell: |
-    $HOME/.cargo/bin/cargo install protoc-gen-prost protoc-gen-tonic
-  become: false
+    "{{ real_user_home.stdout }}/.cargo/bin/cargo" install protoc-gen-prost protoc-gen-tonic
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  environment:
+    HOME: "{{ real_user_home.stdout }}"
+    http_proxy: "{{ proxy | default('') }}"
+    https_proxy: "{{ proxy | default('') }}"
   async: 600
   poll: 10
   tags: [grpc_rust]

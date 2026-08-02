@@ -28,15 +28,13 @@
       tags: [debug]
 
   roles:
-    # - bootstrap
-    # - docker
-    # - golang
-    # - rust
-    # - python
-    # - java
+    - bootstrap
+    - docker
+    - golang
+    - rust
+    - python
+    - java
     - node
-    # - neovim
-    # - lsp
-    # - grpc
-
-
+    - neovim
+    - lsp
+    - grpc

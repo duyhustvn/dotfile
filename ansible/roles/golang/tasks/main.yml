@@ -32,7 +32,8 @@
         line: "export PATH=$PATH:/usr/local/go/bin"
         create: yes
         backup: yes
-      become: false
+      become: true
+      become_user: "{{ real_user.stdout }}"
 
     - name: Ensure $HOME/go/bin is in the PATH (user shell config)
       lineinfile:
@@ -40,7 +41,8 @@
         line: "export PATH=$PATH:$HOME/go/bin"
         create: yes
         backup: yes
-      become: false
+      become: true
+      become_user: "{{ real_user.stdout }}"
 
     - name: Also create system-wide profile for compatibility
       lineinfile:
@@ -52,13 +54,15 @@
     - name: Verify Go installation (direct path)
       shell: "/usr/local/go/bin/go version"
       register: go_version_check
-      become: false
+      become: true
+      become_user: "{{ real_user.stdout }}"
       ignore_errors: true
 
     - name: Verify Go is in PATH (after sourcing config)
       shell: "PATH=$PATH:/usr/local/go/bin go version"
       register: go_path_check
-      become: false
+      become: true
+      become_user: "{{ real_user.stdout }}"
       ignore_errors: true
 
     - name: Display Go installation results
@@ -76,25 +80,21 @@
     - name: Install go packages
       shell: |
         /usr/local/go/bin/go install golang.org/x/tools/gopls@latest
-
         /usr/local/go/bin/go install github.com/x-motemen/gore/cmd/gore@latest
-
         /usr/local/go/bin/go install github.com/stamblerre/gocode@latest
-
         /usr/local/go/bin/go install golang.org/x/tools/cmd/godoc@latest
-
         /usr/local/go/bin/go install golang.org/x/tools/cmd/goimports@latest
-
         /usr/local/go/bin/go install golang.org/x/tools/cmd/gorename@latest
-
         /usr/local/go/bin/go install golang.org/x/tools/cmd/guru@latest
-
         /usr/local/go/bin/go install github.com/cweill/gotests/gotests@latest
-
         /usr/local/go/bin/go install github.com/fatih/gomodifytags@latest
-
         /usr/local/go/bin/go install github.com/go-delve/delve/cmd/dlv@latest
-
         /usr/local/go/bin/go install go.uber.org/mock/mockgen@latest
-      become: false
+      become: true
+      become_user: "{{ real_user.stdout }}"
+      environment:
+        HOME: "{{ real_user_home.stdout }}"
+        GOPATH: "{{ real_user_home.stdout }}/go"
+        http_proxy: "{{ proxy | default('') }}"
+        https_proxy: "{{ proxy | default('') }}"
   tags: [install_go_packages]
