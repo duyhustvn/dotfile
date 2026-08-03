@@ -75,10 +75,15 @@ ln -s $(pwd)/nvim ~/.config/nvim
 ```
 
 ## Setup Doom Emacs
-Copying config for Doom Emacs by creating symlink:
+- Copying config for Doom Emacs by creating symlink:
 ```bash
 ln -s $(pwd)/doom ~/.config/doom
 ```
+- Sync packages
+```
+~/.config/emacs/bin/doom sync
+```
+
 
 ## Setup Tmux
 Copying config for Tmux by creating symlink:
