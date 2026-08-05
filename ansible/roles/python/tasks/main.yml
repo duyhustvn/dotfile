@@ -4,7 +4,7 @@
 # Set shell configuration path globally for all tasks
 
 - name: Install packages
-  include_tasks: install_packages_{{ansible_os_family}}.yml
+  include_tasks: "install_packages_{{ ansible_facts['os_family'] }}.yml"
 
 - include_tasks: install_uv.yml
 

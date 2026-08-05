@@ -670,3 +670,10 @@ The region is specified by START and END positions."
     (with-output-to-temp-buffer "*JSON String*"
       (princ json-string)))) ;; Output to a temporary buffer
 #+end_src
+
+* Markdown
+#+begin_src emacs-lisp
+(after! markdown-mode
+  (setq markdown-command "pandoc")
+  (setq markdown-open-command "xdg-open"))
+#+end_src

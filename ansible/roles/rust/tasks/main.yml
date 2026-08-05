@@ -5,7 +5,11 @@
 - block:
     - name: Check if rust is installed
       shell: |
-        which rustc
+        "{{ real_user_home.stdout }}/.cargo/bin/rustc" --version
+      become: true
+      become_user: "{{ real_user.stdout }}"
+      environment:
+        HOME: "{{ real_user_home.stdout }}"
       register: rust_installed
       changed_when: false
       failed_when: false
@@ -13,6 +17,12 @@
     - name: Install rust using rustup
       shell: |
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      become: true
+      become_user: "{{ real_user.stdout }}"
+      environment:
+        HOME: "{{ real_user_home.stdout }}"
+        http_proxy: "{{ proxy | default('') }}"
+        https_proxy: "{{ proxy | default('') }}"
       register: result
       when: rust_installed.rc != 0
 
@@ -24,7 +34,15 @@
 - block:
     - name: Install StyLua for lua formatter
       shell: |
-        cargo install stylua
+        "{{ real_user_home.stdout }}/.cargo/bin/cargo" install stylua
+      become: true
+      become_user: "{{ real_user.stdout }}"
+      environment:
+        HOME: "{{ real_user_home.stdout }}"
+        http_proxy: "{{ proxy | default('') }}"
+        https_proxy: "{{ proxy | default('') }}"
+      async: 600
+      poll: 10
       register: result
 
     - name: Result

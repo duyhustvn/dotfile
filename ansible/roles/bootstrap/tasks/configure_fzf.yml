@@ -11,7 +11,8 @@
       setopt HIST_IGNORE_ALL_DUPS # Xóa bỏ hoàn toàn các lệnh trùng lặp cũ hơn trong lịch sử.
       setopt HIST_REDUCE_BLANKS # Xóa các khoảng trắng thừa khi lưu lệnh.
   when: "'/zsh' in user_shell.stdout"
-  become: false
+  become: true
+  become_user: "{{ real_user.stdout }}"
 
 - name: Configure fzf options for bash
   ansible.builtin.blockinfile:
@@ -22,4 +23,5 @@
       source <(fzf --bash)
       export FZF_CTRL_R_OPTS="--height 40% --layout=reverse --border" # Tùy chỉnh giao diện: cao 40%, tìm kiếm từ trên xuống, có khung viền
   when: "'/zsh' not in user_shell.stdout"
-  become: false
+  become: true
+  become_user: "{{ real_user.stdout }}"

@@ -1,0 +1,79 @@
+---
+# tasks file for roles/node
+
+- name: Check if nvm is installed
+  stat:
+    path: "{{ real_user_home.stdout }}/.nvm/nvm.sh"
+  register: nvm_stat
+
+- name: Install NVM for real user
+  shell: |
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/{{ nvm_version }}/install.sh | bash
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  when: not nvm_stat.stat.exists
+  environment:
+    HOME: "{{ real_user_home.stdout }}"
+
+- name: Check if Node.js is installed via NVM
+  shell: |
+    export NVM_DIR="{{ real_user_home.stdout }}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    node --version
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  environment:
+    HOME: "{{ real_user_home.stdout }}"
+  register: node_check
+  failed_when: false
+  changed_when: false
+
+- name: Install Node.js using NVM
+  shell: |
+    export NVM_DIR="{{ real_user_home.stdout }}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    nvm install {{ node_version }}
+    nvm alias default {{ node_version }}
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  environment:
+    HOME: "{{ real_user_home.stdout }}"
+  when: node_check.rc != 0
+
+- name: Find active Node.js binary directory from NVM
+  shell: |
+    export NVM_DIR="{{ real_user_home.stdout }}/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+    dirname $(which node)
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  environment:
+    HOME: "{{ real_user_home.stdout }}"
+  register: nvm_node_bin_dir
+  changed_when: false
+
+- name: Ensure Node.js binaries are symlinked to /usr/local/bin
+  file:
+    src: "{{ nvm_node_bin_dir.stdout }}/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    state: link
+    force: yes
+  loop:
+    - node
+    - npm
+    - npx
+  become: true
+  when: nvm_node_bin_dir.stdout is defined and nvm_node_bin_dir.stdout | length > 0
+
+- name: Ensure NVM environment variables are added to shell config
+  blockinfile:
+    path: "{{ shell_config_path }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: NVM"
+    block: |
+      export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+      [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+      [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+    create: yes
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  when: shell_config_path is defined

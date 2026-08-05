@@ -1,193 +1,214 @@
 #!/bin/bash
+# ==============================================================================
+# Script: set_proxy.sh
+# Description: Helper script to set or unset proxy for Shell, Apt, Git, Curl,
+#              Wget, NPM, Yarn, and Docker.
+#
+# Usage:
+#   1. Set Proxy:
+#      ./set_proxy.sh http://proxy.company.com:8080
+#      ./set_proxy.sh http://proxy.company.com:8080 "localhost,127.0.0.1,10.0.0.0/8"
+#      OR
+#      PROXY="http://proxy.company.com:8080" NO_PROXY="localhost,127.0.0.1" ./set_proxy.sh
+#
+#   2. Unset / Clear Proxy:
+#      ./set_proxy.sh unset
+#      OR
+#      ./set_proxy.sh off
+# ==============================================================================
 
-DEFAULT_PROXY=""
-DEFAULT_NO_PROXY="localhost,127.0.0.1"
-DEFAULT_HOME_PATH="/home/vbox"
+set -e
 
-# Check if CUSTOM_PROXY argument is provided
-if [[ "$CUSTOM_PROXY" ]]; then
-    echo "Set proxy to the custom $CUSTOM_PROXY"
-    _proxy="$CUSTOM_PROXY"
+PROXY_URL="${1:-${CUSTOM_PROXY:-${PROXY:-${HTTP_PROXY:-${http_proxy:-""}}}}}"
+NO_PROXY_VAL="${2:-${CUSTOM_NO_PROXY:-${NO_PROXY:-${no_proxy:-"localhost,127.0.0.1,.local"}}}}}"
+
+# Detect real user home directory (works even when script is invoked via sudo)
+REAL_USER="${SUDO_USER:-$USER}"
+HOME_DIR="$(eval echo "~$REAL_USER")"
+
+# Determine Action: set or unset
+if [[ "$PROXY_URL" == "unset" || "$PROXY_URL" == "off" || "$PROXY_URL" == "clear" ]]; then
+    ACTION="unset"
+    PROXY_URL=""
+elif [ -n "$PROXY_URL" ]; then
+    ACTION="set"
 else
-    echo "Set proxy to the default one $DEFAULT_PROXY"
-    _proxy="$DEFAULT_PROXY"
+    ACTION="unset"
 fi
 
-
-
-# Check if CUSTOM_NO_PROXY argument is provided
-if [[ "$CUSTOM_NO_PROXY" ]]; then
-    echo "Set no_proxy to the custom $CUSTOM_NO_PROXY"
-    _no_proxy="$CUSTOM_NO_PROXY"
+echo "=================================================="
+if [ "$ACTION" == "set" ]; then
+    echo " Setting Proxy: $PROXY_URL"
+    echo " No Proxy: $NO_PROXY_VAL"
 else
-    echo "Set no_proxy to the default one $DEFAULT_NO_PROXY"
-    _no_proxy="$DEFAULT_NO_PROXY"
+    echo " Unsetting / Clearing all Proxy configurations"
 fi
+echo " Target Home: $HOME_DIR"
+echo "=================================================="
 
-# Check if CUSTOM_HOME_PATH argument is provided
-if [[ "$CUSTOM_HOME_PATH" ]]; then
-    echo "Set home_path to the custom $CUSTOM_HOME_PATH"
-    _home_path="$CUSTOM_HOME_PATH"
-else
-    echo "Set home_path to the default one $DEFAULT_HOME_PATH"
-    _home_path="$DEFAULT_HOME_PATH"
-fi
+# 1. Configure Shell (.bashrc & .zshrc)
+set_proxy_shell() {
+    local target_files=()
+    [ -f "$HOME_DIR/.bashrc" ] && target_files+=("$HOME_DIR/.bashrc")
+    [ -f "$HOME_DIR/.zshrc" ] && target_files+=("$HOME_DIR/.zshrc")
 
-current_shell=$(basename "$SHELL")
+    for file in "${target_files[@]}"; do
+        # Clean up existing managed proxy block & legacy un-blocked proxy lines
+        sed -i '/# BEGIN PROXY CONFIG/,/# END PROXY CONFIG/d' "$file"
+        sed -i '/export http_proxy=/d; /export https_proxy=/d; /export no_proxy=/d; /export HTTP_PROXY=/d; /export HTTPS_PROXY=/d; /export NO_PROXY=/d' "$file"
 
-if [[ "$current_shell" == "bash" ]]; then 
-    _shell_config_path="$_home_path/.bashrc"
-elif [[ "$current_shell" == "zsh" ]]; then
-    _shell_config_path="$_home_path/.zshrc"
-else
-    echo "Not supported shell $current_shell"
-    return
-fi
-
-
-echo "shell config path $_shell_config_path"
-
-set_proxy_docker() {
-  # Create or update the Docker systemd service override file
-  FILE_PATH="/etc/systemd/system/docker.service.d"
-  # Create the directory if it doesn't exist
-  mkdir -p $FILE_PATH
-  SERVICE_FILE="$FILE_PATH/http-proxy.conf"
-
-  # Write the proxy configuration to the file
-  cat <<EOF > "$SERVICE_FILE"
-[Service]
-Environment="HTTP_PROXY=$_proxy"
-Environment="HTTPS_PROXY=$_proxy"
-Environment="NO_PROXY=$_no_proxy"
+        if [ "$ACTION" == "set" ]; then
+            cat <<EOF >> "$file"
+# BEGIN PROXY CONFIG
+export http_proxy="$PROXY_URL"
+export https_proxy="$PROXY_URL"
+export no_proxy="$NO_PROXY_VAL"
+export HTTP_PROXY="$PROXY_URL"
+export HTTPS_PROXY="$PROXY_URL"
+export NO_PROXY="$NO_PROXY_VAL"
+# END PROXY CONFIG
 EOF
-
-  # Reload the systemd daemon to apply the changes
-  systemctl daemon-reload
-
-  # Restart the Docker service
-  systemctl restart docker
-  echo "Docker proxy set to: $_proxy"
+        fi
+        echo "  [Shell] Updated $(basename "$file")"
+    done
 }
 
-set_proxy_apt() {
-  # Create or update the APT systemd service override file
-  FILE_PATH="/etc/apt/apt.conf.d"
-  SERVICE_FILE="$FILE_PATH/http-proxy.conf"
-  # Write the proxy configuration to the file
-  cat <<EOF > "$SERVICE_FILE"
-Acquire::http::Proxy "$_proxy";
-Acquire::https::Proxy "$_proxy";
-EOF
-
-  echo "APT proxy set to: $_proxy"
-}
-
-
-
-
-
+# 2. Configure Git
 set_proxy_git() {
-  # Create or update the APT systemd service override file
-  FILE_PATH="$_home_path"
-  SERVICE_FILE="$FILE_PATH/.gitconfig"
-  # Write the proxy configuration to the file
-  cat <<EOF > "$SERVICE_FILE"
-[credential]
-      helper = store
-[http "https://github.com"]
-	proxy = $_proxy 
-	sslVerify = false
-
-[https "https://github.com"]
-	proxy = $_proxy 
-	sslVerify = false
-EOF
-
-  echo "Github proxy set to: $_proxy"
+    if command -v git &>/dev/null; then
+        if [ "$ACTION" == "set" ]; then
+            git config --global http.proxy "$PROXY_URL"
+            git config --global https.proxy "$PROXY_URL"
+            echo "  [Git] Proxy configured: $PROXY_URL"
+        else
+            git config --global --unset http.proxy 2>/dev/null || true
+            git config --global --unset https.proxy 2>/dev/null || true
+            echo "  [Git] Proxy unset"
+        fi
+    fi
 }
 
-set_proxy_yarn() {
-  FILE_PATH="$_home_path"
-  SERVICE_FILE="$FILE_PATH/.yarnrc"
-
-  # Write the proxy configuration to the file
-  cat <<EOF > "$SERVICE_FILE"
-http-proxy "$_proxy"
-https-proxy "$_proxy"
-proxy "$_proxy"
-
-strict-ssl false
+# 3. Configure Apt
+set_proxy_apt() {
+    local apt_conf="/etc/apt/apt.conf.d/http-proxy.conf"
+    if [ "$ACTION" == "set" ]; then
+        sudo mkdir -p /etc/apt/apt.conf.d
+        sudo tee "$apt_conf" >/dev/null <<EOF
+Acquire::http::Proxy "$PROXY_URL";
+Acquire::https::Proxy "$PROXY_URL";
 EOF
-
-  echo "Yarn proxy set to: $_proxy"
+        echo "  [APT] Proxy configured in $apt_conf"
+    else
+        [ -f "$apt_conf" ] && sudo rm -f "$apt_conf"
+        echo "  [APT] Proxy removed from $apt_conf"
+    fi
 }
 
-set_proxy_npm() {
-  FILE_PATH="$_home_path"
-  SERVICE_FILE="$FILE_PATH/.npmrc"
+# 4. Configure Curl
+set_proxy_curl() {
+    for h in "$HOME_DIR" "/root"; do
+        local curlrc="$h/.curlrc"
+        if [ "$ACTION" == "set" ]; then
+            if [ "$h" == "/root" ]; then
+                sudo tee "$curlrc" >/dev/null <<< "proxy=\"$PROXY_URL\""
+            else
+                echo "proxy=\"$PROXY_URL\"" > "$curlrc"
+            fi
+        else
+            if [ "$h" == "/root" ]; then
+                [ -f "$curlrc" ] && sudo rm -f "$curlrc"
+            else
+                [ -f "$curlrc" ] && rm -f "$curlrc"
+            fi
+        fi
+    done
+    echo "  [Curl] Proxy $ACTION completed"
+}
 
-  # Write the proxy configuration to the file
-  cat <<EOF > "$SERVICE_FILE"
-http-proxy="$_proxy"
-https-proxy="$_proxy"
-proxy="$_proxy"
+# 5. Configure Wget
+set_proxy_wget() {
+    for h in "$HOME_DIR" "/root"; do
+        local wgetrc="$h/.wgetrc"
+        if [ "$ACTION" == "set" ]; then
+            local content="http_proxy = $PROXY_URL
+https_proxy = $PROXY_URL
+ftp_proxy = $PROXY_URL
+no_proxy = $NO_PROXY_VAL"
+            if [ "$h" == "/root" ]; then
+                sudo tee "$wgetrc" >/dev/null <<< "$content"
+            else
+                echo "$content" > "$wgetrc"
+            fi
+        else
+            if [ "$h" == "/root" ]; then
+                [ -f "$wgetrc" ] && sudo rm -f "$wgetrc"
+            else
+                [ -f "$wgetrc" ] && rm -f "$wgetrc"
+            fi
+        fi
+    done
+    echo "  [Wget] Proxy $ACTION completed"
+}
+
+# 6. Configure NPM & Yarn
+set_proxy_npm_yarn() {
+    if [ "$ACTION" == "set" ]; then
+        cat <<EOF > "$HOME_DIR/.npmrc"
+http-proxy="$PROXY_URL"
+https-proxy="$PROXY_URL"
+proxy="$PROXY_URL"
 strict-ssl=false
 EOF
-
-  echo "Npm proxy set to: $_proxy"
+        cat <<EOF > "$HOME_DIR/.yarnrc"
+http-proxy "$PROXY_URL"
+https-proxy "$PROXY_URL"
+proxy "$PROXY_URL"
+strict-ssl false
+EOF
+        echo "  [NPM/Yarn] Proxy configured"
+    else
+        [ -f "$HOME_DIR/.npmrc" ] && rm -f "$HOME_DIR/.npmrc"
+        [ -f "$HOME_DIR/.yarnrc" ] && rm -f "$HOME_DIR/.yarnrc"
+        echo "  [NPM/Yarn] Proxy removed"
+    fi
 }
 
+# 7. Configure Docker
+set_proxy_docker() {
+    local docker_conf_dir="/etc/systemd/system/docker.service.d"
+    local docker_conf="$docker_conf_dir/http-proxy.conf"
 
-set_proxy_shell() {
-  # Write the proxy configuration to the file
-  cat <<EOF >> "$_shell_config_path"
-export http_proxy="$_proxy"
-export https_proxy="$_proxy"
-export no_proxy="$_no_proxy"
-
-export HTTP_PROXY="$_proxy"
-export HTTPS_PROXY="$_proxy"
-export NO_PROXY="$_no_proxy"
+    if [ "$ACTION" == "set" ]; then
+        sudo mkdir -p "$docker_conf_dir"
+        sudo tee "$docker_conf" >/dev/null <<EOF
+[Service]
+Environment="HTTP_PROXY=$PROXY_URL"
+Environment="HTTPS_PROXY=$PROXY_URL"
+Environment="NO_PROXY=$NO_PROXY_VAL"
 EOF
+        echo "  [Docker] Systemd override created at $docker_conf"
+    else
+        [ -f "$docker_conf" ] && sudo rm -f "$docker_conf"
+        echo "  [Docker] Systemd override removed"
+    fi
 
-  echo "Shell proxy set to: $_proxy"
+    if command -v systemctl &>/dev/null && systemctl is-active --quiet docker 2>/dev/null; then
+        sudo systemctl daemon-reload
+        sudo systemctl restart docker || true
+        echo "  [Docker] Service reloaded"
+    fi
 }
 
-
-set_proxy_curl() {
-  sudo tee $_home_path/.curlrc << EOF
-proxy="$_proxy"
-EOF
-  sudo tee /root/.curlrc << EOF
-proxy="$_proxy"
-EOF
-  echo "Set proxy for curl to: $_proxy"
-}
-
-set_proxy_wget() {
-  sudo tee $_home_path/.wgetrc << EOF
-http_proxy = $_proxy
-https_proxy = $_proxy
-ftp_proxy = $_proxy
-no_proxy = $_no_proxy
-EOF
-
-  sudo tee /root/.wgetrc << EOF
-http_proxy = $_proxy
-https_proxy = $_proxy
-ftp_proxy = $_proxy
-no_proxy = $_no_proxy
-EOF
-
-  echo "Set proxy for wget to: $_proxy"
-}
-
-set_proxy_git
-set_proxy_docker
-set_proxy_apt
-set_proxy_yarn
-set_proxy_npm
+# Execute all functions
 set_proxy_shell
+set_proxy_git
+set_proxy_apt
 set_proxy_curl
 set_proxy_wget
+set_proxy_npm_yarn
+set_proxy_docker
+
+echo "=================================================="
+echo " Proxy configuration $ACTION finished!"
+echo " Note: Restart your shell or run 'source ~/.bashrc' / 'source ~/.zshrc'"
+echo "=================================================="

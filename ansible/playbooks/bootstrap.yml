@@ -33,7 +33,8 @@
     - golang
     - rust
     - python
+    - java
+    - node
     - neovim
     - lsp
-
-
+    - grpc

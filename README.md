@@ -1,24 +1,14 @@
 # Dotfiles Setup
 
-## Prerequisites: Install Ansible
-If Ansible is not installed on your system yet, install it using `pipx` (recommended) or `apt`:
+## Prerequisites: Install Zsh, Oh My Zsh & Ansible
+If Ansible is not installed on your system yet, you can run the bootstrap setup script:
 
-### Option 1: Install via `pipx` (Recommended)
 ```bash
-sudo apt update && sudo apt install -y pipx
-pipx ensurepath
-source ~/.zshrc # or source ~/.bashrc
+# Direct Connection (No Proxy):
+./bootstrap.sh
 
-# Install ansible-core (provides ansible-playbook, ansible-galaxy, etc.)
-pipx install ansible-core
-# Or install full ansible package with all dependencies exposed:
-# pipx install ansible --include-deps
-```
-> **Note**: Make sure `~/.local/bin` is in your `$PATH` (handled by `pipx ensurepath` after restarting terminal or sourcing your shell config).
-
-### Option 2: Install via `apt` (Ubuntu/Debian)
-```bash
-sudo apt update && sudo apt install -y ansible
+# Behind Proxy:
+PROXY="http://proxy.yourcompany.com:8080" NO_PROXY="localhost,127.0.0.1,10.0.0.0/8" ./bootstrap.sh
 ```
 
 ## Setup Requirements Packages
@@ -36,6 +26,8 @@ ansible-playbook -i inventory/office/hosts.yml playbooks/bootstrap.yml --ask-bec
 File icons require a patched **Nerd Font** (e.g., JetBrainsMono Nerd Font).
 
 ### Linux (Ubuntu/Debian/Arch)
+> **Note**: JetBrainsMono Nerd Font is **automatically installed** when running the Ansible `bootstrap` playbook!
+> If you wish to install it manually:
 ```bash
 mkdir -p ~/.local/share/fonts
 wget https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip -O /tmp/JetBrainsMono.zip
@@ -75,21 +67,6 @@ Because WSL runs inside Windows Terminal, fonts must be installed on the **Windo
    - Set **Font face** to `JetBrainsMono Nerd Font` (or `JetBrainsMonoNF`).
    - Click **Save** in the bottom right corner.
 
-#### Kitty (`~/.config/kitty/kitty.conf`)
-```conf
-font_family JetBrainsMono Nerd Font
-```
-
-#### Alacritty (`~/.config/alacritty/alacritty.toml`)
-```toml
-[font.normal]
-family = "JetBrainsMono Nerd Font"
-```
-
-#### WezTerm (`~/.config/wezterm/wezterm.lua`)
-```lua
-config.font = wezterm.font("JetBrainsMono Nerd Font")
-```
 
 ## Setup Neovim
 Copying config for Neovim by creating symlink:
@@ -98,10 +75,15 @@ ln -s $(pwd)/nvim ~/.config/nvim
 ```
 
 ## Setup Doom Emacs
-Copying config for Doom Emacs by creating symlink:
+- Copying config for Doom Emacs by creating symlink:
 ```bash
 ln -s $(pwd)/doom ~/.config/doom
 ```
+- Sync packages
+```
+~/.config/emacs/bin/doom sync
+```
+
 
 ## Setup Tmux
 Copying config for Tmux by creating symlink:

@@ -1,0 +1,22 @@
+---
+- name: Ensure font directory exists
+  ansible.builtin.file:
+    path: "{{ real_user_home.stdout }}/.local/share/fonts"
+    state: directory
+    mode: '0755'
+    owner: "{{ real_user.stdout }}"
+  become: true
+  become_user: "{{ real_user.stdout }}"
+
+- name: Download and extract JetBrainsMono Nerd Font
+  ansible.builtin.unarchive:
+    src: "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"
+    dest: "{{ real_user_home.stdout }}/.local/share/fonts/"
+    remote_src: yes
+    creates: "{{ real_user_home.stdout }}/.local/share/fonts/JetBrainsMonoNerdFont-Regular.ttf"
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  environment:
+    http_proxy: "{{ proxy | default('') }}"
+    https_proxy: "{{ proxy | default('') }}"
+  notify: Refresh font cache

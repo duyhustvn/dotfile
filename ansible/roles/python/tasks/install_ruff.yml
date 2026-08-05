@@ -1,7 +1,12 @@
 - name: Install ruff python linter and code formatter
-  become: false
+  become: true
+  become_user: "{{ real_user.stdout }}"
   shell: |
-    uv tool install ruff@latest
+    "{{ real_user_home.stdout }}/.local/bin/uv" tool install ruff@latest
+  environment:
+    HOME: "{{ real_user_home.stdout }}"
+    http_proxy: "{{ proxy | default('') }}"
+    https_proxy: "{{ proxy | default('') }}"
   register: result
 
 - name: Result
