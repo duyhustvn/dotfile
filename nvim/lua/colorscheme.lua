@@ -1,12 +1,11 @@
 -- define your colorscheme here
-local status_ok, monokai = pcall(require, "monokai")
-if status_ok then
-    monokai.setup({
-        palette = monokai.pro,
-    })
-else
-    local is_ok, _ = pcall(vim.cmd, "colorscheme monokai_pro")
-    if not is_ok then
-        vim.notify("colorscheme monokai_pro not found!")
-    end
+local colorscheme = "monokai_pro"
+
+local is_ok, _ = pcall(vim.cmd, "colorscheme " .. colorscheme)
+if not is_ok then
+	vim.notify("colorscheme " .. colorscheme .. " not found!")
+	return
 end
+
+-- guibg: GUI background (bỏ comment nếu muốn nền trong suốt theo terminal)
+-- vim.cmd.highlight({ "Normal", "guibg=NONE" })

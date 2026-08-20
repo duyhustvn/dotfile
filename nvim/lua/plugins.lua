@@ -14,7 +14,14 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-	"tanvirtin/monokai.nvim",
+	{
+		"tanvirtin/monokai.nvim",
+		lazy = false,
+		priority = 1000,
+		config = function()
+			require("monokai").setup({ palette = require("monokai").pro })
+		end,
+	},
 	-- LSP manager
 	"williamboman/mason.nvim",
 	"williamboman/mason-lspconfig.nvim",
