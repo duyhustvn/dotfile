@@ -13,14 +13,7 @@ require("mason-lspconfig").setup({
 	ensure_installed = { "gopls", "lua_ls", "clangd", "yamlls", "ts_ls", "ansiblels", "dockerls", "dotls" },
 })
 
--- Set different settings for different languages' LSP
--- LSP list: https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
--- How to use setup({}): https://github.com/neovim/nvim-lspconfig/wiki/Understanding-setup-%7B%7D
---     - the settings table is sent to the LSP
---     - on_attach: a lua callback function to run after LSP attaches to a given buffer
-local lspconfig = require("lspconfig")
-
--- Customized on_attach function
+-- Global diagnostic keymaps
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
 local opts = { noremap = true, silent = true }
 vim.keymap.set("n", "<space>e", vim.diagnostic.open_float, opts)
@@ -28,52 +21,43 @@ vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
 vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist, opts)
 
--- Use an on_attach function to only map the following keys
--- after the language server attaches to the current buffer
-local on_attach = function(client, bufnr)
-	-- Enable completion triggered by <c-x><c-o>
-	vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
+-- Set up LSP keymaps and options on LspAttach
+vim.api.nvim_create_autocmd("LspAttach", {
+	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
+	callback = function(ev)
+		-- Enable completion triggered by <c-x><c-o>
+		vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
 
-	-- See `:help vim.lsp.*` for documentation on any of the below functions
-	local bufopts = { noremap = true, silent = true, buffer = bufnr }
-	vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
-	vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
-	vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
-	vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
-	vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts)
-	vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, bufopts)
-	vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, bufopts)
-	vim.keymap.set("n", "<space>wl", function()
-		print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-	end, bufopts)
-	vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
-	vim.keymap.set("n", "<space>cr", vim.lsp.buf.rename, bufopts)
-	vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts)
-	vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
-	vim.keymap.set("n", "<space>f", function()
-		vim.lsp.buf.format({ async = true })
-	end, bufopts)
-end
-
--- Configure each language
--- How to add LSP for a specific language?
--- 1. use `:Mason` to install corresponding LSP
--- 2. add configuration below
-lspconfig.gopls.setup({
-	on_attach = on_attach,
+		-- See `:help vim.lsp.*` for documentation on any of the below functions
+		local bufopts = { noremap = true, silent = true, buffer = ev.buf }
+		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
+		vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
+		vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
+		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
+		vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, bufopts)
+		vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, bufopts)
+		vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, bufopts)
+		vim.keymap.set("n", "<space>wl", function()
+			print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+		end, bufopts)
+		vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
+		vim.keymap.set("n", "<space>cr", vim.lsp.buf.rename, bufopts)
+		vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts)
+		vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
+		vim.keymap.set("n", "<space>f", function()
+			vim.lsp.buf.format({ async = true })
+		end, bufopts)
+	end,
 })
 
-lspconfig.rust_analyzer.setup({
-	on_attach = on_attach,
-})
-
-lspconfig.clangd.setup({
-	on_attach = on_attach,
+-- Configure LSP capabilities (integrate with nvim-cmp)
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
+vim.lsp.config("*", {
+	capabilities = capabilities,
 })
 
 -- Configure YAML LSP
-lspconfig.yamlls.setup({
-	on_attach = on_attach,
+vim.lsp.config("yamlls", {
 	settings = {
 		yaml = {
 			schemas = {
@@ -96,7 +80,6 @@ lspconfig.yamlls.setup({
 	},
 })
 
-lspconfig.ts_ls.setup({
-	on_attach = on_attach,
-})
+-- Enable LSP servers
+vim.lsp.enable({ "gopls", "lua_ls", "clangd", "yamlls", "ts_ls", "ansiblels", "dockerls", "dotls", "rust_analyzer" })
 
