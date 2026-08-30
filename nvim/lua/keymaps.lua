@@ -40,3 +40,7 @@ vim.keymap.set('n', '<leader>ot', ':botright split | terminal<CR>', opts)
 vim.keymap.set('v', '<C-c>', '"+y', opts)
 -- Paste from system clipboard in insert mode
 vim.keymap.set('i', '<C-v>', '<C-r>+', opts)
+
+-- Markdown Preview
+vim.keymap.set('n', '<leader>mp', ':MarkdownPreviewToggle<CR>', opts)
+

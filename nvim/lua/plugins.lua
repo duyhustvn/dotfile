@@ -135,6 +135,21 @@ require("lazy").setup({
 		end,
 	},
 
+	-- Syntax highlighting with Treesitter
+	{
+		"nvim-treesitter/nvim-treesitter",
+		lazy = false,
+		build = ":TSUpdate",
+		config = function()
+			require("nvim-treesitter").setup()
+			vim.api.nvim_create_autocmd("FileType", {
+				callback = function()
+					pcall(vim.treesitter.start)
+				end,
+			})
+		end,
+	},
+
 	-- Markdown
 	{
 		"MeanderingProgrammer/render-markdown.nvim",
@@ -144,6 +159,15 @@ require("lazy").setup({
 		---@module 'render-markdown'
 		---@type render.md.UserConfig
 		opts = {},
+	},
+	{
+		"iamcco/markdown-preview.nvim",
+		cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+		build = "cd app && npx --yes yarn install",
+		init = function()
+			vim.g.mkdp_filetypes = { "markdown" }
+		end,
+		ft = { "markdown" },
 	},
 
 	-- Debug Adapter Protocol (DAP)

@@ -13,5 +13,9 @@
 - name: Ensure the binary is in the system PATH
   ansible.builtin.file:
     src: /opt/nvim-linux-x86_64/bin/nvim
-    dest: /usr/local/bin/vim
+    dest: "{{ item }}"
     state: link
+  loop:
+    - /usr/local/bin/vim
+    - /usr/local/bin/nvim
+
