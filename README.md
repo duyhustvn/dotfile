@@ -92,7 +92,33 @@ ln -s $(pwd)/tmux/tmux.conf ~/.tmux.conf
 ```
 
 ## Setup Zellij
+
+### Installation
+
+#### Linux / WSL (Prebuilt Binary - Recommended)
+```bash
+curl -LO https://github.com/zellij-org/zellij/releases/latest/download/zellij-x86_64-unknown-linux-musl.tar.gz
+tar -xvf zellij-x86_64-unknown-linux-musl.tar.gz
+chmod +x zellij
+mkdir -p ~/.local/bin
+mv zellij ~/.local/bin/
+rm zellij-x86_64-unknown-linux-musl.tar.gz
+```
+
+#### macOS (Homebrew)
+```bash
+brew install zellij
+```
+
+#### Cargo (Rust)
+```bash
+cargo install --locked zellij
+```
+
+### Configuration
 Copying config for Zellij by creating symlink:
 ```bash
-ln -s $(pwd)/zellij/config.kdl ~/.config/zellij/config.kdl
+mkdir -p ~/.config/zellij
+ln -sf $(pwd)/zellij/config.kdl ~/.config/zellij/config.kdl
 ```
+
