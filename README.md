@@ -118,3 +118,7 @@ mkdir -p ~/.config/zellij
 ln -sf $(pwd)/zellij/config.kdl ~/.config/zellij/config.kdl
 ```
 
+### Cheatsheet
+For detailed keybindings and operation guide, see [zellij/CHEATSHEET.md](file:///home/vbox/projects/dotfile/zellij/CHEATSHEET.md).
+
+
