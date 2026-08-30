@@ -90,3 +90,9 @@ Copying config for Tmux by creating symlink:
 ```bash
 ln -s $(pwd)/tmux/tmux.conf ~/.tmux.conf
 ```
+
+## Setup Zellij
+Copying config for Zellij by creating symlink:
+```bash
+ln -s $(pwd)/zellij/config.kdl ~/.config/zellij/config.kdl
+```
