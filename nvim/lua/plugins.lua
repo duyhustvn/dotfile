@@ -51,7 +51,6 @@ require("lazy").setup({
 	-- Find file
 	{
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.8",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			-- Optional: for better sorting performance
