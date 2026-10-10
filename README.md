@@ -97,12 +97,8 @@ ln -s $(pwd)/tmux/tmux.conf ~/.tmux.conf
 
 #### Linux / WSL (Prebuilt Binary - Recommended)
 ```bash
-curl -LO https://github.com/zellij-org/zellij/releases/latest/download/zellij-x86_64-unknown-linux-musl.tar.gz
-tar -xvf zellij-x86_64-unknown-linux-musl.tar.gz
-chmod +x zellij
-mkdir -p ~/.local/bin
-mv zellij ~/.local/bin/
-rm zellij-x86_64-unknown-linux-musl.tar.gz
+# Install system-wide to /usr/local/bin for all users (including root)
+curl -sSL https://github.com/zellij-org/zellij/releases/latest/download/zellij-x86_64-unknown-linux-musl.tar.gz | sudo tar -xz -C /usr/local/bin
 ```
 
 #### macOS (Homebrew)
@@ -121,4 +117,8 @@ Copying config for Zellij by creating symlink:
 mkdir -p ~/.config/zellij
 ln -sf $(pwd)/zellij/config.kdl ~/.config/zellij/config.kdl
 ```
+
+### Cheatsheet
+For detailed keybindings and operation guide, see [zellij/CHEATSHEET.md](file:///home/vbox/projects/dotfile/zellij/CHEATSHEET.md).
+
 
