@@ -20,3 +20,13 @@
     http_proxy: "{{ proxy | default('') }}"
     https_proxy: "{{ proxy | default('') }}"
   notify: Refresh font cache
+
+- name: Configure Ptyxis Terminal font
+  ansible.builtin.command: "{{ item }}"
+  loop:
+    - gsettings set org.gnome.Ptyxis use-system-font false
+    - gsettings set org.gnome.Ptyxis font-name 'JetBrainsMono Nerd Font 11'
+  become: true
+  become_user: "{{ real_user.stdout }}"
+  failed_when: false
+  changed_when: false

@@ -15,8 +15,32 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
 	{
+		"catppuccin/nvim",
+		name = "catppuccin",
+		priority = 1000,
+		config = function()
+			require("catppuccin").setup({
+				flavour = "mocha", -- latte, frappe, macchiato, mocha
+				integrations = {
+					treesitter = true,
+					native_lsp = {
+						enabled = true,
+					},
+					telescope = {
+						enabled = true,
+					},
+					nvimtree = true,
+					neogit = true,
+					dap = true,
+					dap_ui = true,
+					cmp = true,
+				},
+			})
+		end,
+	},
+	{
 		"tanvirtin/monokai.nvim",
-		lazy = false,
+		lazy = true,
 		priority = 1000,
 		config = function()
 			require("monokai").setup({ palette = require("monokai").pro })
