@@ -34,6 +34,10 @@ require("lazy").setup({
 					dap = true,
 					dap_ui = true,
 					cmp = true,
+					gitsigns = true,
+					indent_blankline = {
+						enabled = true,
+					},
 				},
 			})
 		end,
@@ -56,6 +60,53 @@ require("lazy").setup({
 		"nvim-tree/nvim-tree.lua",
 		dependencies = {
 			"nvim-tree/nvim-web-devicons", -- file icon
+		},
+	},
+
+	-- Statusline
+	{
+		"nvim-lualine/lualine.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		config = function()
+			require("lualine").setup({
+				options = {
+					theme = "catppuccin-mocha",
+					component_separators = "|",
+					section_separators = { left = "", right = "" },
+				},
+				sections = {
+					lualine_a = { { "mode", separator = { left = "" }, right_padding = 2 } },
+					lualine_b = { "branch", "diff", "diagnostics" },
+					lualine_c = { { "filename", path = 1 } },
+					lualine_x = { "encoding", "fileformat", "filetype" },
+					lualine_y = { "progress" },
+					lualine_z = { { "location", separator = { right = "" }, left_padding = 2 } },
+				},
+			})
+		end,
+	},
+
+	-- Git signs on line numbers
+	{
+		"lewis6991/gitsigns.nvim",
+		config = function()
+			require("gitsigns").setup()
+		end,
+	},
+
+	-- Indentation guides
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		main = "ibl",
+		opts = {
+			indent = {
+				char = "│",
+			},
+			scope = {
+				enabled = true,
+				show_start = false,
+				show_end = false,
+			},
 		},
 	},
 
